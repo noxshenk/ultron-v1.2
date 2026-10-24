@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ULTRON AI</title>
-<meta name="description" content="POCKET COMPANION PC-01 by NEXUS LABS. A living OLED face, 3W voice, INMP441 mic, ESP32-C3 brain and an honest 18-hour battery. Ten parts. Nothing to hide.">
+<meta name="description" content="POCKET COMPANION PC-01 by NEXUS LABS. A living OLED face, 3W voice, INMP441 mic, ESP32-S3 brain and an honest 18-hour battery. Ten parts. Nothing to hide.">
 <meta name="theme-color" content="#050507">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -546,7 +546,7 @@ body.is-ready :is(.hero__scroll,.hero__specs,.hero-v2__stock){opacity:1}
       <li><span>P-03</span><b>SPEAKER GRILL — PERF. STEEL</b></li>
       <li><span>P-04</span><b>DRIVER — 36 MM · 8 Ω</b></li>
       <li><span>P-05</span><b>BUTTONS — 3× TACTILE</b></li>
-      <li><span>P-06</span><b>ESP32-C3 — SUPERMINI</b></li>
+      <li><span>P-06</span><b>ESP32-S3 — DEV MODULE</b></li>
       <li><span>P-07</span><b>MAX98357A — 3 W CLASS-D</b></li>
       <li><span>P-08</span><b>INMP441 — I²S MEMS MIC</b></li>
       <li><span>P-09</span><b>LI-PO CELL — 1200 mAh</b></li>
@@ -665,7 +665,7 @@ body.is-ready :is(.hero__scroll,.hero__specs,.hero-v2__stock){opacity:1}
       </article>
       <article class="detail">
         <div class="detail__n">03</div>
-        <div><h3 class="detail__t">THE BRAIN</h3><p class="detail__c">ESP32-C3 — single-core RISC-V at 160 MHz with Wi-Fi and BLE 5.0 onboard. USB-C for power and flashing. Arduino, ESP-IDF or CircuitPython — your call.</p></div>
+        <div><h3 class="detail__t">THE BRAIN</h3><p class="detail__c">ESP32-S3 — dual-core Xtensa LX7 at 240 MHz with Wi-Fi and BLE 5.0 onboard. Dual USB-C ports for power and flashing. Arduino, ESP-IDF or CircuitPython — your call.</p></div>
       </article>
     </div>
     <div class="details__label pe"><span>SPECIMENS</span><i></i><b>01 — 03</b></div>
@@ -718,10 +718,11 @@ body.is-ready :is(.hero__scroll,.hero__specs,.hero-v2__stock){opacity:1}
   </div>
   <div class="sheet" data-reveal>
     <div class="sheet__row"><div class="sheet__k">COMPUTE</div><dl>
-      <div><dt>MCU</dt><dd>ESP32-C3 · RISC-V @160 MHz</dd></div>
+      <div><dt>MCU</dt><dd>ESP32-S3 · DUAL-CORE LX7 @240 MHz</dd></div>
       <div><dt>WIRELESS</dt><dd>Wi-Fi 802.11 b/g/n</dd></div>
       <div><dt>RADIO</dt><dd>BLE 5.0 LE</dd></div>
-      <div><dt>FLASH</dt><dd>4 MB</dd></div>
+      <div><dt>FLASH</dt><dd>8 MB</dd></div>
+      <div><dt>PSRAM</dt><dd>8 MB</dd></div>
     </dl></div>
     <div class="sheet__row"><div class="sheet__k">DISPLAY</div><dl>
       <div><dt>PANEL</dt><dd>1.3&Prime; OLED</dd></div>
@@ -1013,28 +1014,58 @@ function speakerGrillTexture() {
     ctx.beginPath(); ctx.arc(cx, cy, 9, 0, 6.28); ctx.fill();
   });
 }
-function esp32SuperMiniTex() {
-  return makeCanvas(512, 512, (ctx, w, h) => {
-    ctx.fillStyle = '#08090c'; ctx.fillRect(0, 0, w, h);
-    ctx.fillStyle = '#d9b244';
-    for (let i = 0; i < 8; i++) {
-      const y = 50 + i * 56;
-      ctx.fillRect(6, y, 32, 24); ctx.fillRect(w - 38, y, 32, 24);
-      ctx.beginPath(); ctx.arc(6, y + 12, 10, -Math.PI/2, Math.PI/2); ctx.fillStyle = '#08090c'; ctx.fill();
-      ctx.beginPath(); ctx.arc(w - 6, y + 12, 10, Math.PI/2, -Math.PI/2); ctx.fill();
-      ctx.fillStyle = '#d9b244';
+/* ESP32-S3 dev module PCB silkscreen — 720×500 maps the 3.5 × 2.45 board face */
+function esp32S3DevKitTex() {
+  return makeCanvas(720, 500, (ctx, w, h) => {
+    /* glossy black FR4 */
+    ctx.fillStyle = '#0a0c10'; ctx.fillRect(0, 0, w, h);
+    /* faint copper traces */
+    ctx.strokeStyle = 'rgba(58,68,88,.42)'; ctx.lineWidth = 1.5;
+    for (let i = 0; i < 30; i++) {
+      const x0 = 90 + Math.random() * 300, y0 = 60 + Math.random() * 380;
+      ctx.beginPath(); ctx.moveTo(x0, y0);
+      ctx.lineTo(x0 + 40 + Math.random() * 90, y0);
+      ctx.lineTo(x0 + 40 + Math.random() * 90, 50 + Math.random() * 400);
+      ctx.stroke();
     }
-    ctx.fillStyle = '#cbd5e1'; ctx.font = 'bold 18px monospace';
-    const leftPins = ['5V','GND','3V3','IO0','IO1','IO2','IO3','IO4'];
-    const rightPins = ['IO10','IO9','IO8','IO7','IO6','IO5','IO20','IO21'];
-    leftPins.forEach((p, i) => ctx.fillText(p, 46, 68 + i * 56));
-    rightPins.forEach((p, i) => { ctx.textAlign = 'right'; ctx.fillText(p, w - 46, 68 + i * 56); ctx.textAlign = 'left'; });
-    ctx.strokeStyle = '#181f2b'; ctx.lineWidth = 2.5;
-    for (let i = 0; i < 18; i++) {
-      ctx.beginPath(); ctx.moveTo(100 + Math.random() * 300, 80); ctx.lineTo(256, 256); ctx.lineTo(100 + Math.random() * 300, 420); ctx.stroke();
-    }
-    ctx.fillStyle = '#7a889b'; ctx.font = '13px monospace';
-    ctx.fillText('ESP32-C3', 205, 340); ctx.fillText('SuperMini', 202, 360);
+    /* through-hole pads along both long edges */
+    const padRow = y => {
+      for (let i = 0; i < 14; i++) {
+        const x = 39 + i * 49.3;
+        ctx.fillStyle = '#d9b244'; ctx.beginPath(); ctx.arc(x, y, 10, 0, 6.28); ctx.fill();
+        ctx.fillStyle = '#0a0c10'; ctx.beginPath(); ctx.arc(x, y, 4.5, 0, 6.28); ctx.fill();
+      }
+    };
+    padRow(34); padRow(466);
+    /* silkscreen pin labels */
+    const topPins = ['3V3','EN','4','5','6','7','15','16','17','18','8','3','46','9'];
+    const botPins = ['5V','GND','1','2','42','41','40','39','38','37','36','35','0','GND'];
+    ctx.fillStyle = 'rgba(226,232,240,.88)'; ctx.font = 'bold 13px monospace'; ctx.textAlign = 'center';
+    topPins.forEach((p, i) => ctx.fillText(p, 39 + i * 49.3, 78));
+    botPins.forEach((p, i) => ctx.fillText(p, 39 + i * 49.3, 424));
+    /* port + button labels — mirrors the listing photo */
+    ctx.font = 'bold 12px monospace';
+    ctx.fillText('CAM', 136, 99); ctx.fillText('RGB', 123, 344);
+    ctx.fillText('DAC OUT', 200, 384); ctx.fillText('DC 5V', 272, 384);
+    ctx.fillText('BOOT', 283, 156); ctx.fillText('RST', 188, 340);
+    /* board + cert marks */
+    ctx.font = 'bold 20px monospace';
+    ctx.fillText('ESP32-S3 DEV MODULE', 510, 88);
+    ctx.font = '11px monospace';
+    ctx.fillText('FCC ID 2AC7E-ESP32S3 · CE · ULTRON PC-01 REV C', 510, 108);
+    ctx.fillText('ANT', 637, 108);
+    /* antenna keep-out hatch */
+    ctx.strokeStyle = 'rgba(226,232,240,.5)'; ctx.lineWidth = 2;
+    ctx.strokeRect(575, 120, 125, 260);
+    ctx.save(); ctx.beginPath(); ctx.rect(577, 122, 121, 256); ctx.clip();
+    ctx.lineWidth = 1.2;
+    for (let i = -260; i < 130; i += 11) { ctx.beginPath(); ctx.moveTo(575 + i, 120); ctx.lineTo(575 + i + 260, 380); ctx.stroke(); }
+    ctx.restore();
+    /* mounting holes */
+    [[22, 22], [698, 22], [22, 478], [698, 478]].forEach(([x, y]) => {
+      ctx.fillStyle = '#d7dbe2'; ctx.beginPath(); ctx.arc(x, y, 11, 0, 6.28); ctx.fill();
+      ctx.fillStyle = '#050608'; ctx.beginPath(); ctx.arc(x, y, 6.5, 0, 6.28); ctx.fill();
+    });
   });
 }
 function max98357AmpTex() {
@@ -1212,47 +1243,89 @@ const tactileButtons = (function () {
   });
 })();
 
-/* 6 · ESP32-C3 SUPERMINI */
-const espSuperMini = (function () {
+/* 6 · ESP32-S3 DEV MODULE */
+const espS3Dev = (function () {
   const g = new THREE.Group();
-  const pcb = pcbBox(2.1, 2.1, 0.12, esp32SuperMiniTex(), C.pcbBlack);
+  const pcb = pcbBox(3.5, 2.45, 0.14, esp32S3DevKitTex(), C.pcbBlack);
   g.add(pcb);
-  const usbGroup = new THREE.Group();
-  const shellMesh = new THREE.Mesh(new RoundedBoxGeometry(0.9, 0.4, 0.45, 4, 0.08), metal(0x8a92a0, { roughness: 0.15, metalness: 1.0 }));
-  shellMesh.scale.y = 0.85; usbGroup.add(shadow(shellMesh));
-  const cavityMesh = new THREE.Mesh(new RoundedBoxGeometry(0.72, 0.22, 0.3, 4, 0.06), mat(0x050505));
-  cavityMesh.position.set(0, -0.15, 0); cavityMesh.scale.y = 0.9; usbGroup.add(cavityMesh);
-  const tongueMesh = new THREE.Mesh(new RoundedBoxGeometry(0.65, 0.08, 0.2, 2, 0.04), new THREE.MeshStandardMaterial({ color: 0x1a1a1c, roughness: 0.6, metalness: 0.1 }));
-  tongueMesh.position.set(0, -0.12, 0); usbGroup.add(tongueMesh);
-  const contactMat = metal(0xd9b244, { roughness: 0.15 });
-  for (let i = 0; i < 4; i++) {
-    const c = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.02, 0.15), contactMat);
-    c.position.set(-0.25 + i * 0.16, -0.085, 0); usbGroup.add(c);
-  }
-  usbGroup.position.set(0, -1.15, 0.22); g.add(usbGroup);
-  const antBody = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.58, 0.16), mat(C.antennaRed, { roughness: 0.3 }));
-  antBody.position.set(-0.66, 0.72, 0.14); g.add(antBody);
-  const antCap = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.16, 0.165), mat(0xffffff));
-  antCap.position.set(-0.66, 0.93, 0.14); g.add(antCap);
-  const crystal = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.24, 0.1), metal(0xd0b468, { roughness: 0.3 }));
-  crystal.position.set(0.12, 0.82, 0.11); g.add(crystal);
-  const qfnChip = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.55, 0.08), mat(C.chip, { roughness: 0.3 }));
-  qfnChip.rotation.z = Math.PI / 4; qfnChip.position.set(-0.05, 0.22, 0.1); g.add(shadow(qfnChip));
-  [-0.26, 0.26].forEach(x => {
-    const btnBase = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.18, 0.09), metal(0x8e97a4, { roughness: 0.3 }));
-    btnBase.position.set(x, -0.32, 0.1); g.add(btnBase);
-    const btnAct = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.06, 12), mat(0x18181c));
-    btnAct.rotation.x = Math.PI / 2; btnAct.position.set(x, -0.32, 0.16); g.add(btnAct);
+  /* dual USB-C on the bottom edge */
+  const usbC = () => {
+    const u = new THREE.Group();
+    const shell = new THREE.Mesh(new RoundedBoxGeometry(0.5, 0.42, 0.2, 3, 0.05), metal(0xb9c0cc, { roughness: 0.22 }));
+    u.add(shadow(shell));
+    const mouth = new THREE.Mesh(new RoundedBoxGeometry(0.08, 0.3, 0.12, 2, 0.03), mat(0x060608));
+    mouth.position.x = -0.25; u.add(mouth);
+    const tongue = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.2, 0.03), mat(0x10161c));
+    tongue.position.x = -0.22; u.add(tongue);
+    u.position.set(-1.64, 0, 0.16);
+    return u;
+  };
+  const usbTop = usbC(); usbTop.position.y = 0.55; g.add(usbTop);
+  const usbBot = usbC(); usbBot.position.y = -0.55; g.add(usbBot);
+  /* ESP32-S3-WROOM-1 — dark carrier PCB + gold laser-etched shield */
+  const modBase = new THREE.Mesh(new THREE.BoxGeometry(1.95, 1.2, 0.03), mat(0x14161b, { roughness: 0.5 }));
+  modBase.position.set(0.72, 0.05, 0.085); g.add(modBase);
+  const shield = new THREE.Mesh(new RoundedBoxGeometry(1.4, 1.2, 0.24, 3, 0.02), metal(0xc4a35f, { roughness: 0.36 }));
+  shield.position.set(0.55, 0.05, 0.2); g.add(shadow(shield));
+  const shieldTopTex = makeCanvas(256, 224, (ctx, w, h) => {
+    ctx.fillStyle = '#c9a861'; ctx.fillRect(0, 0, w, h);
+    for (let i = 0; i < 420; i++) {
+      ctx.fillStyle = `rgba(255,244,214,${Math.random() * 0.07})`;
+      ctx.fillRect(Math.random() * w, Math.random() * h, 18 + Math.random() * 60, 1);
+    }
+    ctx.fillStyle = 'rgba(64,48,18,.92)';
+    ctx.font = 'bold 30px monospace'; ctx.fillText('ESP32-S3', 18, 54);
+    ctx.font = '13px monospace';
+    ctx.fillText('WROOM-1 · N8R8', 18, 80);
+    ctx.fillText('FCC ID 2AC7E-ESP32S3', 18, 100);
+    for (let yy = 0; yy < 8; yy++) for (let xx = 0; xx < 8; xx++)
+      if ((xx * 7 + yy * 5) % 3 !== 0) ctx.fillRect(186 + xx * 6, 120 + yy * 6, 6, 6);
   });
-  [-0.94, 0.94].forEach(x => {
-    const hdr = pinHeaderStrip(8, 0.24, 0x151619, 0.55);
-    hdr.position.set(x, 0.0, -0.2); hdr.rotation.y = Math.PI; g.add(hdr);
+  const shieldTop = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.36, 1.16),
+    new THREE.MeshStandardMaterial({ map: shieldTopTex, metalness: 0.88, roughness: 0.34, envMapIntensity: 1.5 })
+  );
+  shieldTop.position.set(0.55, 0.05, 0.321); g.add(shieldTop);
+  /* RST + BOOT tactile switches */
+  const tactBtn = (oy) => {
+    const b = new THREE.Group();
+    const base = new THREE.Mesh(new RoundedBoxGeometry(0.34, 0.34, 0.1, 2, 0.02), metal(0x9aa2ad, { roughness: 0.3 }));
+    b.add(shadow(base));
+    const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.09, 20), metal(0xd6dae0, { roughness: 0.24 }));
+    cap.rotation.x = Math.PI / 2; cap.position.z = 0.08; b.add(cap);
+    b.position.set(-0.62, oy, 0.12);
+    return b;
+  };
+  g.add(tactBtn(0.3), tactBtn(-0.3));
+  /* camera FPC connector */
+  const camConn = new THREE.Mesh(new RoundedBoxGeometry(0.5, 0.42, 0.14, 2, 0.03), mat(0x101216, { roughness: 0.45 }));
+  camConn.position.set(-0.55, 0.74, 0.14); g.add(shadow(camConn));
+  /* addressable RGB LED */
+  const rgbLed = new THREE.Mesh(new RoundedBoxGeometry(0.18, 0.18, 0.1, 2, 0.02),
+    new THREE.MeshPhysicalMaterial({ color: 0xf2f4f8, roughness: 0.3, emissive: 0x7c3cff, emissiveIntensity: 0.6 }));
+  rgbLed.position.set(-1.15, -0.62, 0.12); g.add(rgbLed);
+  /* LDO + passives */
+  const ldo = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.16, 0.08), metal(0xb8bec8, { roughness: 0.3 }));
+  ldo.position.set(-1.25, -0.24, 0.11); g.add(ldo);
+  const smdM = [mat(0x8a7d5c), mat(0x2a2d33), mat(0x6e6757)];
+  [[-0.924, -0.637, 0.12, 0.08], [-0.632, -0.657, 0.1, 0.06], [-0.365, -0.637, 0.14, 0.08], [0.05, -0.6, 0.1, 0.06], [-0.05, 0.62, 0.1, 0.06]]
+    .forEach(([x, y, sx, sy], i) => {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, 0.05), smdM[i % 3]);
+      m.position.set(x, y, 0.1); g.add(m);
+    });
+  /* yellow header rows — both long edges */
+  [-1.06, 1.06].forEach(y => {
+    const hdr = pinHeaderStrip(14, 0.24, C.yellowHeader, 0.36);
+    hdr.rotation.z = Math.PI / 2;
+    hdr.position.set(0, y, 0.07);
+    g.add(hdr);
   });
   g.rotation.z = Math.PI / 2;
   return register(g, {
-    name: 'ESP32-C3 SuperMini', tag: 'RISC-V · WI-FI / BLE',
-    desc: 'Single-core RISC-V SoC at 160 MHz, onboard ceramic antenna, USB-C for power and flashing.',
-    asm: new THREE.Vector3(0.85, 0.0, -0.1), exp: new THREE.Vector3(1.5, 0.0, 0.4)
+    name: 'ESP32-S3 Dev Module',
+    tag: 'DUAL-CORE LX7 · WI-FI / BLE 5',
+    desc: 'Dual-core Xtensa LX7 at 240 MHz with Wi-Fi + BLE 5, 8 MB flash / 8 MB PSRAM, dual USB-C, RST / BOOT buttons and an addressable RGB LED.',
+    asm: new THREE.Vector3(0.85, 0.0, -0.06), exp: new THREE.Vector3(1.7, 0.0, 0.5)
   });
 })();
 
@@ -1416,25 +1489,29 @@ function rebuildWires() {
   });
 }
 
-/* OLED bottom edge → ESP top header (4 signal wires) */
+/* NOTE: anchor offsets live in ASSEMBLY space — they are NOT rotated by the part's own
+   rotation. espS3Dev has rotation.z = π/2, so its board (3.5 local-x × 2.45 local-y) reads
+   2.45 wide × 3.5 tall in assembly space: two vertical header rows at x = ±1.06 with pins
+   spanning y ∈ [−1.56, 1.56] (pin tips z ≈ 0.38), and dual USB-C on the short edge y ≈ −1.64. */
+/* OLED back face → ESP left header, top 4 pins */
 [-0.9, -0.3, 0.3, 0.9].forEach((x, i) =>
-  addRun(oledModule, [x, -1.15, -0.05], espSuperMini, [-0.6 + i * 0.4, 1.0, -0.1],
+  addRun(oledModule, [x, -1.15, -0.05], espS3Dev, [-1.06, 1.56 - i * 0.24, 0.34],
     [0x2aa5e8, 0xf0a202, 0xe03c31, 0x3dcf6e][i], 0.026, 0.45));
-/* AMP right edge → ESP left pins (5 bus wires) */
+/* AMP right edge → ESP left header, bottom 5 pins */
 for (let i = 0; i < 5; i++)
-  addRun(maxAmpBreakout, [0.8, -0.36 + i * 0.18, 0.05], espSuperMini, [-0.95, -0.45 + i * 0.22, 0.02],
-    [0x7b5cff, 0x2aa5e8, 0x3dcf6e, 0xf0a202, 0xe03c31][i], 0.024, 0.4, (i - 2) * 0.04);
-/* MIC bottom → ESP top-left pins (3 wires) */
+  addRun(maxAmpBreakout, [0.8, -0.36 + i * 0.18, 0.05], espS3Dev, [-1.06, -0.12 - i * 0.24, 0.34],
+    [0x7b5cff, 0x2aa5e8, 0x3dcf6e, 0xf0a202, 0xe03c31][i], 0.024, 0.4, (i - 2) * 0.05);
+/* MIC bottom rim → ESP left header, middle 3 pins */
 for (let i = 0; i < 3; i++)
-  addRun(inmpMicBreakout, [-0.35 + i * 0.35, -0.55, 0], espSuperMini, [-0.6 + i * 0.25, 1.0, -0.12],
-    [0xeeeeee, 0xf278c9, 0x222222][i], 0.024, 0.5, -0.15);
-/* Battery BMS pads → ESP bottom pins (power, red + black) */
+  addRun(inmpMicBreakout, [-0.35 + i * 0.35, -0.55, 0], espS3Dev, [-1.06, 0.6 - i * 0.24, 0.34],
+    [0xeeeeee, 0xf278c9, 0x222222][i], 0.024, 0.5, -0.12);
+/* Battery BMS pads → ESP bottom short edge, between the dual USB-C (power in) */
 [0xff2222, 0x141414].forEach((col, i) =>
-  addRun(batteryPack, [-0.15 + i * 0.3, 1.9, 0.15], espSuperMini, [-0.25 + i * 0.5, -1.02, 0.05],
+  addRun(batteryPack, [-0.15 + i * 0.3, 1.9, 0.15], espS3Dev, [-0.15 + i * 0.3, -1.72, -0.02],
     col, 0.028, 0.55));
-/* AMP output terminals → speaker basket (red + black) */
+/* AMP output terminals → speaker magnet solder terminals */
 [0xe03c31, 0x141414].forEach((col, i) =>
-  addRun(maxAmpBreakout, [-0.17 + i * 0.34, 0.55, 0.32], speakerDriver, [-0.28 + i * 0.56, -0.62, -0.18],
+  addRun(maxAmpBreakout, [-0.17 + i * 0.34, 0.55, 0.32], speakerDriver, [-0.28 + i * 0.56, -0.62, -0.5],
     col, 0.032, 0.5));
 rebuildWires();
 
