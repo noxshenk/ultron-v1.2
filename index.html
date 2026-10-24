@@ -739,7 +739,7 @@ body.is-ready :is(.hero__scroll,.hero__specs,.hero-v2__stock){opacity:1}
     <div class="sheet__row"><div class="sheet__k">POWER</div><dl>
       <div><dt>CELL</dt><dd>Li-Po 3.7 V · 1200 mAh</dd></div>
       <div><dt>RUNTIME</dt><dd>≈ 18 H MIXED</dd></div>
-      <div><dt>CHARGE</dt><dd>USB-C · 5 V</dd></div>
+      <div><dt>CHARGE</dt><dd>USB-C × 2 · 5 V underside ports</dd></div>
       <div><dt>SLEEP</dt><dd>340 µA</dd></div>
     </dl></div>
     <div class="sheet__row"><div class="sheet__k">BUILD</div><dl>
@@ -1159,16 +1159,20 @@ const frontHousing = (function () {
   const wallT = 0.18, wallD = 0.9, wallW = 4.24, wallH = 7.04;
   const lw = new THREE.Mesh(new THREE.BoxGeometry(wallT, wallH, wallD), caseM); lw.position.set(-2.21, 0, 0.4); g.add(shadow(lw));
   const tw = new THREE.Mesh(new THREE.BoxGeometry(wallW, wallT, wallD), caseM); tw.position.set(0, 3.21, 0.4); g.add(shadow(tw));
-  const bw = new THREE.Mesh(new THREE.BoxGeometry(wallW, wallT, wallD), caseM); bw.position.set(0, -3.21, 0.4); g.add(shadow(bw));
-  const rbw = new THREE.Mesh(new THREE.BoxGeometry(wallT, 3.02, wallD), caseM); rbw.position.set(2.21, -2.01, 0.4); g.add(shadow(rbw));
-  const rtw = new THREE.Mesh(new THREE.BoxGeometry(wallT, 3.02, wallD), caseM); rtw.position.set(2.21, 2.01, 0.4); g.add(shadow(rtw));
+  /* bottom wall — outer slab + inner segments leave two pass-through slots on the
+     underside where the ESP32-S3 dual USB-C charge ports exit */
+  const bOuter = new THREE.Mesh(new THREE.BoxGeometry(wallW, wallT, 0.55), caseM); bOuter.position.set(0, -3.21, 0.575); g.add(shadow(bOuter));
+  [[2.16, -1.04], [0.58, 0.85], [0.46, 1.89]].forEach(([sw, sx]) => {
+    const seg = new THREE.Mesh(new THREE.BoxGeometry(sw, wallT, 0.35), caseM); seg.position.set(sx, -3.21, 0.125); g.add(shadow(seg));
+  });
+  const rw = new THREE.Mesh(new THREE.BoxGeometry(wallT, wallH, wallD), caseM); rw.position.set(2.21, 0, 0.4); g.add(shadow(rw));
   [-1.15, 0, 1.15].forEach(x => {
     const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.06, 28), mat(C.caseBezel, { clearcoat: 0.5 }));
     rim.rotation.x = Math.PI / 2; rim.position.set(x, 3.7, 0.45); g.add(rim);
   });
   return register(g, {
     name: 'Front Housing', tag: 'POLISHED ABS',
-    desc: 'Front shell with precision bevels, direct display aperture and the acoustic speaker port.',
+    desc: 'Front shell with precision bevels, display aperture, acoustic port and dual USB-C charge ports on the underside.',
     asm: new THREE.Vector3(0, 0, 0), exp: new THREE.Vector3(0, 0, 5.0)
   });
 })();
@@ -1221,7 +1225,7 @@ const speakerDriver = (function () {
   return register(g, {
     name: 'Dynamic Speaker Driver', tag: '36mm 2W · 8Ω',
     desc: 'Driven directly by the MAX98357A I2S Class D mono amplifier for punchy companion audio.',
-    asm: new THREE.Vector3(0, -1.65, 0.55), exp: new THREE.Vector3(0, -1.65, 1.9)
+    asm: new THREE.Vector3(0, -1.65, 0.75), exp: new THREE.Vector3(0, -1.65, 1.9)
   });
 })();
 
@@ -1257,7 +1261,7 @@ const espS3Dev = (function () {
     mouth.position.x = -0.25; u.add(mouth);
     const tongue = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.2, 0.03), mat(0x10161c));
     tongue.position.x = -0.22; u.add(tongue);
-    u.position.set(-1.64, 0, 0.16);
+    u.position.set(-1.76, 0, 0.16);
     return u;
   };
   const usbTop = usbC(); usbTop.position.y = 0.55; g.add(usbTop);
@@ -1315,7 +1319,7 @@ const espS3Dev = (function () {
     });
   /* yellow header rows — both long edges */
   [-1.06, 1.06].forEach(y => {
-    const hdr = pinHeaderStrip(14, 0.24, C.yellowHeader, 0.36);
+    const hdr = pinHeaderStrip(14, 0.24, C.yellowHeader, 0.28);
     hdr.rotation.z = Math.PI / 2;
     hdr.position.set(0, y, 0.07);
     g.add(hdr);
@@ -1325,7 +1329,7 @@ const espS3Dev = (function () {
     name: 'ESP32-S3 Dev Module',
     tag: 'DUAL-CORE LX7 · WI-FI / BLE 5',
     desc: 'Dual-core Xtensa LX7 at 240 MHz with Wi-Fi + BLE 5, 8 MB flash / 8 MB PSRAM, dual USB-C, RST / BOOT buttons and an addressable RGB LED.',
-    asm: new THREE.Vector3(0.85, 0.0, -0.06), exp: new THREE.Vector3(1.7, 0.0, 0.5)
+    asm: new THREE.Vector3(0.85, -1.3, -0.06), exp: new THREE.Vector3(1.7, 0.0, 0.5)
   });
 })();
 
@@ -1416,19 +1420,19 @@ const rearHousing = (function () {
   const lw = new THREE.Mesh(new THREE.BoxGeometry(wallT, wallH, wallD), caseM); lw.position.set(-2.21, 0, -0.5); g.add(shadow(lw));
   const tw = new THREE.Mesh(new THREE.BoxGeometry(wallW, wallT, wallD), caseM); tw.position.set(0, 3.21, -0.5); g.add(shadow(tw));
   const bw = new THREE.Mesh(new THREE.BoxGeometry(wallW, wallT, wallD), caseM); bw.position.set(0, -3.21, -0.5); g.add(shadow(bw));
-  const rbw = new THREE.Mesh(new THREE.BoxGeometry(wallT, 3.02, wallD), caseM); rbw.position.set(2.21, -2.01, -0.5); g.add(shadow(rbw));
-  const rtw = new THREE.Mesh(new THREE.BoxGeometry(wallT, 3.02, wallD), caseM); rtw.position.set(2.21, 2.01, -0.5); g.add(shadow(rtw));
+  const rw = new THREE.Mesh(new THREE.BoxGeometry(wallT, wallH, wallD), caseM); rw.position.set(2.21, 0, -0.5); g.add(shadow(rw));
   const bossM = mat(0x111215, { clearcoat: 0.5 });
   const brassM = metal(C.gold, { roughness: 0.3 });
-  [[-1.85, -3.2], [1.85, -3.2], [-1.85, 3.2], [1.85, 3.2]].forEach(([x, y]) => {
-    const b = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.85, 16), bossM);
+  /* bottom-right post is shortened so it clears the seated ESP32-S3 board corner */
+  [[-1.85, -3.2, 0.85], [1.85, -3.2, 0.5], [-1.85, 3.2, 0.85], [1.85, 3.2, 0.85]].forEach(([x, y, len]) => {
+    const b = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, len, 16), bossM);
     b.rotation.x = Math.PI / 2; b.position.set(x, y, -0.5); g.add(b);
-    const hole = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.88, 12), brassM);
+    const hole = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, len + 0.03, 12), brassM);
     hole.rotation.x = Math.PI / 2; hole.position.copy(b.position); g.add(hole);
   });
   return register(g, {
     name: 'Rear Enclosure', tag: 'MATTE ABS',
-    desc: 'Rear tub housing internal threaded brass standoffs, USB-C pass-through, and structural ribbing.',
+    desc: 'Rear tub housing internal threaded brass standoffs and structural ribbing.',
     asm: new THREE.Vector3(0, 0, 0), exp: new THREE.Vector3(0, 0, -4.6)
   });
 })();
@@ -1492,26 +1496,26 @@ function rebuildWires() {
 /* NOTE: anchor offsets live in ASSEMBLY space — they are NOT rotated by the part's own
    rotation. espS3Dev has rotation.z = π/2, so its board (3.5 local-x × 2.45 local-y) reads
    2.45 wide × 3.5 tall in assembly space: two vertical header rows at x = ±1.06 with pins
-   spanning y ∈ [−1.56, 1.56] (pin tips z ≈ 0.38), and dual USB-C on the short edge y ≈ −1.64. */
+   spanning y ∈ [−1.56, 1.56], and dual USB-C exiting the underside through slots in the bottom wall. */
 /* OLED back face → ESP left header, top 4 pins */
 [-0.9, -0.3, 0.3, 0.9].forEach((x, i) =>
-  addRun(oledModule, [x, -1.15, -0.05], espS3Dev, [-1.06, 1.56 - i * 0.24, 0.34],
+  addRun(oledModule, [x, -1.15, -0.05], espS3Dev, [-1.06, 1.56 - i * 0.24, 0.28],
     [0x2aa5e8, 0xf0a202, 0xe03c31, 0x3dcf6e][i], 0.026, 0.45));
 /* AMP right edge → ESP left header, bottom 5 pins */
 for (let i = 0; i < 5; i++)
-  addRun(maxAmpBreakout, [0.8, -0.36 + i * 0.18, 0.05], espS3Dev, [-1.06, -0.12 - i * 0.24, 0.34],
+  addRun(maxAmpBreakout, [0.8, -0.36 + i * 0.18, 0.05], espS3Dev, [-1.06, -0.12 - i * 0.24, 0.28],
     [0x7b5cff, 0x2aa5e8, 0x3dcf6e, 0xf0a202, 0xe03c31][i], 0.024, 0.4, (i - 2) * 0.05);
 /* MIC bottom rim → ESP left header, middle 3 pins */
 for (let i = 0; i < 3; i++)
-  addRun(inmpMicBreakout, [-0.35 + i * 0.35, -0.55, 0], espS3Dev, [-1.06, 0.6 - i * 0.24, 0.34],
+  addRun(inmpMicBreakout, [-0.35 + i * 0.35, -0.55, 0], espS3Dev, [-1.06, 0.6 - i * 0.24, 0.28],
     [0xeeeeee, 0xf278c9, 0x222222][i], 0.024, 0.5, -0.12);
-/* Battery BMS pads → ESP bottom short edge, between the dual USB-C (power in) */
+/* Battery BMS pads → ESP top edge (power in, short hop across the case) */
 [0xff2222, 0x141414].forEach((col, i) =>
-  addRun(batteryPack, [-0.15 + i * 0.3, 1.9, 0.15], espS3Dev, [-0.15 + i * 0.3, -1.72, -0.02],
+  addRun(batteryPack, [-0.15 + i * 0.3, 1.9, 0.15], espS3Dev, [-0.15 + i * 0.3, 1.72, -0.02],
     col, 0.028, 0.55));
 /* AMP output terminals → speaker magnet solder terminals */
 [0xe03c31, 0x141414].forEach((col, i) =>
-  addRun(maxAmpBreakout, [-0.17 + i * 0.34, 0.55, 0.32], speakerDriver, [-0.28 + i * 0.56, -0.62, -0.5],
+  addRun(maxAmpBreakout, [-0.17 + i * 0.34, 0.55, 0.32], speakerDriver, [-0.28 + i * 0.56, -0.62, -0.47],
     col, 0.032, 0.5));
 rebuildWires();
 
