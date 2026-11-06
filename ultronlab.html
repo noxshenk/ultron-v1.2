@@ -1,0 +1,1320 @@
+  <!DOCTYPE html>
+  <html lang="en" class="dark">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ULTRON AI LAB</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Space+Grotesk:wght@300..700&display=swap"
+      rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+      rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-black": "#060709",
+              "surface-dim": "#0a0c10",
+              "surface-card": "#0e1117",
+              "surface-card-high": "#151922",
+              "surface-card-highest": "#1c222e",
+
+              // TOXIC GREEN PALETTE
+              "toxic": "#00ff66",
+              "toxic-glow": "#39ff14",
+              "toxic-bright": "#66ff99",
+              "toxic-dim": "#00b347",
+              "toxic-dark": "#032b13",
+              "toxic-darker": "#021a0b",
+              "toxic-border": "rgba(0, 255, 102, 0.22)",
+
+              "foreground-white": "#F3F7F4",
+              "foreground-muted": "#95A299",
+              "foreground-dim": "#57655B"
+            },
+            fontFamily: {
+              "headline": ["Space Grotesk", "sans-serif"],
+              "body": ["Archivo Narrow", "sans-serif"],
+              "mono": ["JetBrains Mono", "monospace"]
+            },
+            boxShadow: {
+              "toxic-sm": "0 0 10px rgba(0, 255, 102, 0.35)",
+              "toxic-md": "0 0 20px rgba(0, 255, 102, 0.45), inset 0 0 10px rgba(0, 255, 102, 0.2)",
+              "toxic-lg": "0 0 35px rgba(0, 255, 102, 0.6), 0 0 10px rgba(57, 255, 20, 0.4)",
+              "toxic-inner": "inset 0 2px 6px rgba(0, 0, 0, 0.8), inset 0 0 12px rgba(0, 255, 102, 0.15)"
+            }
+          }
+        }
+      };
+    </script>
+    <style>
+      * {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+        user-select: none;
+        box-sizing: border-box;
+      }
+
+      input,
+      textarea {
+        user-select: text;
+      }
+
+      ::-webkit-scrollbar {
+        display: none;
+      }
+
+      * {
+        scrollbar-width: none;
+      }
+
+      /* Toxic glow utilities */
+      .glow-text-toxic {
+        text-shadow: 0 0 12px rgba(0, 255, 102, 0.75), 0 0 25px rgba(0, 255, 102, 0.35);
+      }
+
+      .glow-box-toxic {
+        box-shadow: 0 0 24px rgba(0, 255, 102, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+      }
+
+      /* CRT Scanline & Phosphor Overlay */
+      .crt-overlay {
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%,
+            rgba(0, 0, 0, 0.4) 50%), linear-gradient(90deg,
+            rgba(255, 0, 0, 0.03),
+            rgba(0, 255, 0, 0.02),
+            rgba(0, 0, 255, 0.03));
+        background-size: 100% 3px, 6px 100%;
+        pointer-events: none;
+      }
+
+      /* Screen transition states */
+      .screen-view {
+        display: none;
+        opacity: 0;
+        transform: translateY(8px) scale(0.99);
+        transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .screen-view.active-screen {
+        display: flex;
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+
+      /* Tactile button spring click effect */
+      .tactile-btn {
+        transition: all 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      .tactile-btn:active {
+        transform: scale(0.96);
+      }
+
+      /* Range slider custom thumb */
+      input[type=range] {
+        -webkit-appearance: none;
+        background: #151922;
+        border-radius: 9999px;
+      }
+
+      input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        height: 18px;
+        width: 18px;
+        border-radius: 50%;
+        background: #00ff66;
+        box-shadow: 0 0 12px #00ff66;
+        cursor: pointer;
+        border: 2px solid #060709;
+        transition: transform 0.1s ease;
+      }
+
+      input[type=range]::-webkit-slider-thumb:hover {
+        transform: scale(1.2);
+      }
+    </style>
+  </head>
+
+  <body
+    class="bg-[#050608] text-foreground-white font-body min-h-screen flex flex-col justify-between selection:bg-toxic selection:text-black overflow-x-hidden">
+    <!-- Background Cyber Ambient Glow -->
+    <div
+      class="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-toxic/10 rounded-full blur-[140px] pointer-events-none z-0">
+    </div>
+    <!-- ========================================================================= -->
+    <!-- RESPONSIVE HEADER BAR (PHONE / TABLET / PC) -->
+    <!-- ========================================================================= -->
+    <header
+      class="sticky top-0 w-full z-50 bg-surface-black/85 backdrop-blur-2xl border-b border-toxic/15 shadow-[0_4px_25px_rgba(0,0,0,0.8)]">
+      <div class="max-w-7xl mx-auto px-4 lg:px-8 h-16 flex items-center justify-between">
+        <!-- Brand & Node Identifier -->
+        <div class="flex items-center gap-3">
+          <div
+            class="flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-surface-card border border-toxic/25 shadow-toxic-sm">
+            <div
+              class="w-8 h-5 rounded-full bg-surface-black flex items-center justify-center gap-1 border border-toxic/30 shadow-[inset_0_1px_4px_rgba(0,0,0,0.9)]">
+              <span class="w-1.5 h-1.5 rounded-full bg-toxic animate-pulse shadow-[0_0_8px_#00ff66]"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-toxic animate-pulse shadow-[0_0_8px_#00ff66]"></span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="font-headline font-bold text-sm tracking-wider text-foreground-white">ULTRON</span>
+              <span class="w-1 h-1 rounded-full bg-toxic"></span>
+              <span id="header-connection-status"
+                class="font-mono text-[10px] text-toxic uppercase font-semibold tracking-wider">ONLINE</span>
+            </div>
+          </div>
+          <span
+            class="hidden md:inline-block font-mono text-[11px] text-foreground-dim uppercase tracking-widest pl-2 border-l border-white/10">
+          </span>
+        </div>
+        <!-- Desktop Navigation Tabs (Visible on Tablet & PC: md and above) -->
+        <nav class="hidden md:flex items-center gap-1 bg-surface-dim p-1.5 rounded-2xl border border-white/10">
+          <button onclick="switchScreen('home')" id="desk-tab-home"
+            class="desk-nav-btn tactile-btn px-4 py-2 rounded-xl text-xs font-mono font-bold flex items-center gap-2 bg-toxic text-black shadow-toxic-sm">
+            <span class="material-symbols-outlined text-[16px]">robot_2</span>
+            <span>COMPANION</span>
+          </button>
+          <button onclick="switchScreen('tuner')" id="desk-tab-tuner"
+            class="desk-nav-btn tactile-btn px-4 py-2 rounded-xl text-xs font-mono font-bold flex items-center gap-2 text-foreground-muted hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-[16px]">tune</span>
+            <span>TUNER</span>
+          </button>
+          <button onclick="switchScreen('store')" id="desk-tab-store"
+            class="desk-nav-btn tactile-btn px-4 py-2 rounded-xl text-xs font-mono font-bold flex items-center gap-2 text-foreground-muted hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-[16px]">shopping_bag</span>
+            <span>STORE</span>
+          </button>
+          <button onclick="switchScreen('pair')" id="desk-tab-pair"
+            class="desk-nav-btn tactile-btn px-4 py-2 rounded-xl text-xs font-mono font-bold flex items-center gap-2 text-foreground-muted hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-[16px]">wifi_tethering</span>
+            <span>ESP32 LINK</span>
+          </button>
+        </nav>
+        <!-- Right Controls: Status & Cart -->
+        <div class="flex items-center gap-2.5">
+          <!-- Live Wi-Fi dBm Badge -->
+          <button onclick="switchScreen('pair')"
+            class="tactile-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-card border border-white/5 hover:border-toxic/40 transition-all">
+            <span id="wifi-icon" class="material-symbols-outlined text-[16px] text-toxic">wifi</span>
+            <span id="wifi-dbm" class="font-mono text-xs text-foreground-muted font-bold">-58 dBm</span>
+          </button>
+          <!-- Cart Badge -->
+          <button onclick="switchScreen('store')"
+            class="tactile-btn flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-card-high border border-toxic/30 hover:bg-surface-card-highest transition-colors shadow-toxic-sm">
+            <span class="material-symbols-outlined text-[16px] text-toxic">shopping_bag</span>
+            <span id="header-cart-count" class="font-mono text-xs font-bold text-foreground-white">00</span>
+          </button>
+          <!-- Desktop Power Toggle Shortcut -->
+          <button onclick="toggleSystemPower()"
+            class="hidden md:flex tactile-btn w-9 h-9 rounded-full bg-surface-card border border-toxic/30 items-center justify-center text-toxic hover:bg-toxic hover:text-black transition-colors"
+            title="Toggle System Power">
+            <span class="material-symbols-outlined text-[18px]">power_settings_new</span>
+          </button>
+        </div>
+      </div>
+    </header>
+    <!-- ========================================================================= -->
+    <!-- MAIN RESPONSIVE CONTENT AREA -->
+    <!-- ========================================================================= -->
+    <main class="flex-1 w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 relative z-10 pb-28 md:pb-12">
+      <!-- ======================================================================= -->
+      <!-- SCREEN 1: COMPANION HOME / OLED HUD -->
+      <!-- ======================================================================= -->
+      <section id="screen-home" class="screen-view active-screen flex-col space-y-6">
+
+        <!-- Responsive Grid Layout: Left Column = Head Unit, Right Column = Telemetry & Actions on Tablet/PC -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full items-start">
+
+          <!-- LEFT COLUMN: The Robot Head Unit (45% Width on Desktop) -->
+          <div class="lg:col-span-5 flex flex-col space-y-4">
+            <!-- Emotion Selector Chips -->
+            <div class="flex items-center gap-2 overflow-x-auto py-1 text-xs no-scrollbar">
+              <button onclick="setExpression('idle', this)"
+                class="mood-chip tactile-btn px-3.5 py-2 rounded-xl bg-toxic text-black font-mono font-bold flex items-center gap-1.5 flex-shrink-0 text-xs shadow-toxic-sm transition-all">
+                <span class="w-1.5 h-1.5 rounded-full bg-black"></span>
+                <span>IDLE</span>
+              </button>
+              <button onclick="setExpression('happy', this)"
+                class="mood-chip tactile-btn px-3.5 py-2 rounded-xl bg-surface-card text-foreground-muted hover:text-white border border-white/5 flex items-center gap-1.5 flex-shrink-0 text-xs font-mono font-medium transition-all">
+                <span class="w-1.5 h-1.5 rounded-full bg-foreground-dim"></span>
+                <span>HAPPY</span>
+              </button>
+              <button onclick="setExpression('curious', this)"
+                class="mood-chip tactile-btn px-3.5 py-2 rounded-xl bg-surface-card text-foreground-muted hover:text-white border border-white/5 flex items-center gap-1.5 flex-shrink-0 text-xs font-mono font-medium transition-all">
+                <span class="w-1.5 h-1.5 rounded-full bg-foreground-dim"></span>
+                <span>CURIOUS</span>
+              </button>
+              <button onclick="setExpression('excited', this)"
+                class="mood-chip tactile-btn px-3.5 py-2 rounded-xl bg-surface-card text-foreground-muted hover:text-white border border-white/5 flex items-center gap-1.5 flex-shrink-0 text-xs font-mono font-medium transition-all">
+                <span class="w-1.5 h-1.5 rounded-full bg-foreground-dim"></span>
+                <span>OVERDRIVE</span>
+              </button>
+              <button onclick="setExpression('sleepy', this)"
+                class="mood-chip tactile-btn px-3.5 py-2 rounded-xl bg-surface-card text-foreground-muted hover:text-white border border-white/5 flex items-center gap-1.5 flex-shrink-0 text-xs font-mono font-medium transition-all">
+                <span class="w-1.5 h-1.5 rounded-full bg-foreground-dim"></span>
+                <span>SLEEP</span>
+              </button>
+            </div>
+            <!-- TOXIC OLED ROBOT FACE STAGE (Responsive Height) -->
+            <div id="oled-stage"
+              class="relative w-full h-64 md:h-72 lg:h-80 rounded-3xl bg-surface-dim border border-toxic/25 shadow-[0_15px_45px_rgba(0,0,0,0.9),0_0_25px_rgba(0,255,102,0.15)] flex flex-col items-center justify-center p-6 cursor-pointer overflow-hidden group select-none">
+              <!-- CRT Scanline & Grid Effect -->
+              <div class="crt-overlay absolute inset-0 z-20"></div>
+              <!-- Toxic Phosphor Glow -->
+              <div
+                class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,255,102,0.14)_0%,rgba(0,0,0,0.85)_75%)] pointer-events-none">
+              </div>
+              <!-- Top HUD Data Line -->
+              <div
+                class="absolute top-4 left-5 right-5 flex items-center justify-between text-[11px] font-mono text-foreground-dim uppercase tracking-wider pointer-events-none z-30">
+                <span class="flex items-center gap-1.5 text-toxic font-semibold">
+                  <span class="w-2 h-2 rounded-full bg-toxic animate-pulse"></span>
+                </span>
+                <span id="mood-label" class="text-toxic-bright font-bold glow-text-toxic">ATTENTIVE / IDLE</span>
+              </div>
+              <!-- Organic Dynamic Eyes Container -->
+              <div id="eyes-container"
+                class="flex items-center justify-center gap-10 md:gap-14 py-4 z-10 transition-transform duration-100 ease-out">
+                <!-- Left Eye Socket -->
+                <div id="eye-wrap-l" class="transition-all duration-150 origin-center">
+                  <div id="eye-l"
+                    class="relative w-16 md:w-20 h-24 md:h-28 rounded-full bg-gradient-to-b from-[#e6fff0] via-[#00ff66] to-[#009933] p-1 flex items-center justify-center shadow-[inset_0_0_15px_rgba(255,255,255,0.9),0_0_30px_rgba(0,255,102,0.85)]">
+                    <div id="pupil-l"
+                      class="w-10 md:w-12 h-16 md:h-18 rounded-full bg-[#060a08] flex items-start justify-end p-2 relative overflow-hidden transition-all duration-100">
+                      <div class="w-2.5 h-2.5 rounded-full bg-white opacity-90 shadow-[0_0_6px_#fff]"></div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Right Eye Socket -->
+                <div id="eye-wrap-r" class="transition-all duration-150 origin-center">
+                  <div id="eye-r"
+                    class="relative w-16 md:w-20 h-24 md:h-28 rounded-full bg-gradient-to-b from-[#e6fff0] via-[#00ff66] to-[#009933] p-1 flex items-center justify-center shadow-[inset_0_0_15px_rgba(255,255,255,0.9),0_0_30px_rgba(0,255,102,0.85)]">
+                    <div id="pupil-r"
+                      class="w-10 md:w-12 h-16 md:h-18 rounded-full bg-[#060a08] flex items-start justify-end p-2 relative overflow-hidden transition-all duration-100">
+                      <div class="w-2.5 h-2.5 rounded-full bg-white opacity-90 shadow-[0_0_6px_#fff]"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Bottom Stage Hint -->
+              <div
+                class="absolute bottom-4 text-[10px] font-mono text-foreground-dim uppercase tracking-widest flex items-center gap-1.5 group-hover:text-toxic transition-colors z-30">
+                <span class="material-symbols-outlined text-[14px] text-toxic animate-bounce">touch_app</span>
+                TAP TO PET & WINK / MOVE TO TRACK GAZE
+              </div>
+            </div>
+            <!-- Console Terminal Output -->
+            <div class="p-4 rounded-2xl bg-surface-dim border border-white/5 font-mono text-xs space-y-1">
+              <div class="flex items-center justify-between text-foreground-dim text-[10px]">
+                <span>ULTRON BUS CONSOLE</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-toxic animate-ping"></span>
+              </div>
+              <div id="console-line" class="text-toxic truncate glow-text-toxic">SYSTEM READY: Ultron core connected over
+                telemetry bus.</div>
+            </div>
+          </div>
+          <!-- RIGHT COLUMN: Real-Time Telemetry & Tactical Actions (55% Width on Desktop) -->
+          <div class="lg:col-span-7 flex flex-col space-y-4">
+            <!-- LIVE OSCILLOSCOPE TELEMETRY CARD -->
+            <div class="rounded-3xl bg-surface-card p-4 md:p-5 border border-toxic/15 shadow-xl relative overflow-hidden">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-toxic animate-ping shadow-toxic-sm"></span>
+                  <span class="font-mono text-xs md:text-sm uppercase text-foreground-white font-bold tracking-wider">LIVE
+                    BUS TELEMETRY</span>
+                </div>
+                <span id="charge-time-est" class="font-mono text-xs text-toxic font-semibold">EST. 28 MIN TO FULL
+                  CHARGE</span>
+              </div>
+              <!-- Canvas Viewport -->
+              <div class="relative w-full h-32 md:h-40 bg-surface-dim rounded-2xl border border-white/5 overflow-hidden">
+                <canvas id="telemetry-canvas" class="w-full h-full block"></canvas>
+                <div class="crt-overlay absolute inset-0"></div>
+                <!-- Float Labels -->
+                <div class="absolute bottom-3 left-4 flex items-center gap-3 z-10">
+                  <span id="telemetry-volt-label"
+                    class="font-mono text-sm md:text-base font-bold text-foreground-white glow-text-toxic">84% ·
+                    4.12V</span>
+                  <span
+                    class="font-mono text-[10px] text-black bg-toxic font-bold px-2 py-0.5 rounded shadow-toxic-sm">FAST_CHG
+                    2.0</span>
+                </div>
+                <div class="absolute bottom-3 right-4 font-mono text-xs text-toxic-bright font-bold z-10">
+                  +1.24A CURRENT DRAW
+                </div>
+              </div>
+            </div>
+            <!-- Sensors Telemetry Grid (2 Cols) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- I2S Audio Amp Card -->
+              <div class="rounded-2xl bg-surface-card p-4 border border-white/5 flex flex-col justify-between">
+                <div class="flex items-center justify-between text-foreground-dim text-xs font-mono">
+                  <span>MAX98357A AMPLIFIER</span>
+                  <span class="material-symbols-outlined text-[18px] text-toxic">volume_up</span>
+                </div>
+                <div class="my-3">
+                  <div id="amp-wattage" class="font-headline text-3xl text-foreground-white font-bold">3.2W</div>
+                </div>
+                <div class="w-full bg-surface-card-highest h-2 rounded-full overflow-hidden">
+                  <div class="bg-toxic w-2/3 h-full rounded-full shadow-toxic-sm"></div>
+                </div>
+              </div>
+              <!-- Wi-Fi 802.11 Telemetry Card -->
+              <div class="rounded-2xl bg-surface-card p-4 border border-white/5 flex flex-col justify-between">
+                <div class="flex items-center justify-between text-foreground-dim text-xs font-mono">
+                  <span>WI-FI CONNECTIVITY STATUS</span>
+                  <span class="material-symbols-outlined text-[18px] text-toxic">wifi</span>
+                </div>
+                <div class="my-3">
+                  <div id="wifi-card-rssi" class="font-headline text-3xl text-foreground-white font-bold">-58 dBm</div>
+                </div>
+                <div class="w-full bg-surface-card-highest h-2 rounded-full overflow-hidden">
+                  <div class="bg-toxic w-4/5 h-full rounded-full shadow-toxic-sm"></div>
+                </div>
+              </div>
+            </div>
+            <!-- Tactical Hardware Quick Actions Grid (1 Col Mobile, 3 Cols on Tablet/PC) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <!-- Explode 3D Internals -->
+              <button onclick="triggerExplodeSchematic()"
+                class="tactile-btn p-4 rounded-2xl bg-surface-card border border-white/5 hover:border-toxic/30 shadow-md flex items-center justify-between md:flex-col md:items-start md:gap-3 text-left">
+                <div
+                  class="w-10 h-10 rounded-xl bg-surface-dim flex items-center justify-center text-toxic border border-toxic/20 shadow-inner">
+                  <span class="material-symbols-outlined text-[20px]">layers</span>
+                </div>
+                <div>
+                  <div class="text-sm font-semibold text-foreground-white font-headline">Explode 3D Internals</div>
+                </div>
+              </button>
+              <!-- Run Diagnostic Ping -->
+              <button onclick="triggerDiagnosticPing()"
+                class="tactile-btn p-4 rounded-2xl bg-surface-card border border-white/5 hover:border-toxic/30 shadow-md flex items-center justify-between md:flex-col md:items-start md:gap-3 text-left">
+                <div
+                  class="w-10 h-10 rounded-xl bg-surface-dim flex items-center justify-center text-toxic border border-toxic/20 shadow-inner">
+                  <span class="material-symbols-outlined text-[20px]">radar</span>
+                </div>
+                <div>
+                  <div class="text-sm font-semibold text-foreground-white font-headline">Diagnostic Ping</div>
+                </div>
+              </button>
+              <!-- Speak Test Phrase -->
+              <button onclick="triggerSpeechSynth()"
+                class="tactile-btn p-4 rounded-2xl bg-surface-card-high border border-toxic/30 shadow-toxic-sm flex items-center justify-between md:flex-col md:items-start md:gap-3 text-left">
+                <div
+                  class="w-10 h-10 rounded-xl bg-surface-dim flex items-center justify-center text-toxic border border-toxic/30 shadow-inner">
+                  <span class="material-symbols-outlined text-[20px]">record_voice_over</span>
+                </div>
+                <div>
+                  <div class="text-sm font-semibold text-foreground-white font-headline">Speak Phrase</div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- ======================================================================= -->
+      <!-- SCREEN 2: HARDWARE TUNER & ACOUSTIC CALIBRATION                         -->
+      <!-- ======================================================================= -->
+      <section id="screen-tuner" class="screen-view flex-col space-y-6">
+        <div>
+          <h1 class="font-headline text-3xl md:text-4xl uppercase font-bold text-foreground-white tracking-tight">HARDWARE
+            TUNER</h1>
+          <p class="font-body text-sm text-foreground-muted">Calibrate audio input matrices, gaze damping, and neural VAD
+            thresholds.</p>
+        </div>
+        <!-- Responsive Grid for Tuner: 2-Columns on Tablet and Desktop -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full items-start">
+          <!-- Left: Audio Input Matrix & Gain Arc -->
+          <div class="p-5 md:p-6 rounded-3xl bg-surface-card border border-white/5 shadow-2xl space-y-5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="material-symbols-outlined text-toxic text-[22px]">graphic_eq</span>
+                <h2 class="font-headline text-lg uppercase text-foreground-white font-bold tracking-wide">Audio Preamp
+                  Matrix</h2>
+              </div>
+              <span id="gain-db-display" class="font-mono text-sm text-toxic font-bold glow-text-toxic">+18.0 dB</span>
+            </div>
+            <!-- Circular SVG DB Meter Gauge with Neon Toxic Arc -->
+            <div class="flex items-center justify-center py-4">
+              <div class="relative w-48 h-48 flex items-center justify-center">
+                <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="38" stroke="#151922" stroke-width="6" fill="none" stroke-dasharray="238.7"
+                    stroke-dashoffset="60" />
+                  <circle id="gain-meter-arc" cx="50" cy="50" r="38" stroke="#00ff66" stroke-width="6" fill="none"
+                    stroke-linecap="round" stroke-dasharray="238.7" stroke-dashoffset="120"
+                    class="transition-all duration-300 filter drop-shadow-[0_0_8px_#00ff66]" />
+                </svg>
+                <div class="absolute flex flex-col items-center justify-center">
+                  <span id="selected-hw-gain"
+                    class="font-headline text-4xl font-bold text-foreground-white glow-text-toxic">+18dB</span>
+                  <span class="font-mono text-[10px] text-foreground-dim uppercase tracking-wider">HARDWARE GAIN</span>
+                </div>
+              </div>
+            </div>
+            <!-- Gain Preset Buttons -->
+            <div class="grid grid-cols-4 gap-2.5">
+              <button onclick="setHardwareGain('0dB', this)"
+                class="hw-step-btn tactile-btn py-2.5 rounded-xl bg-surface-card-high text-xs font-mono font-medium hover:border-toxic/30 border border-white/5 transition-all">0dB</button>
+              <button onclick="setHardwareGain('12dB', this)"
+                class="hw-step-btn tactile-btn py-2.5 rounded-xl bg-surface-card-high text-xs font-mono font-medium hover:border-toxic/30 border border-white/5 transition-all">12dB</button>
+              <button onclick="setHardwareGain('18dB', this)"
+                class="hw-step-btn tactile-btn py-2.5 rounded-xl bg-toxic text-black font-mono text-xs font-bold shadow-toxic-sm">18dB</button>
+              <button onclick="setHardwareGain('24dB', this)"
+                class="hw-step-btn tactile-btn py-2.5 rounded-xl bg-surface-card-high text-xs font-mono font-medium hover:border-toxic/30 border border-white/5 transition-all">24dB</button>
+            </div>
+            <!-- Echo Cancellation AEC Switch -->
+            <div class="flex items-center justify-between pt-4 border-t border-white/5">
+              <div>
+                <div class="text-sm font-mono text-foreground-white uppercase font-bold">Hardware Echo Cancellation (AEC)
+                </div>
+                <div class="text-xs text-foreground-dim">Hardware DSP phase reversal filter</div>
+              </div>
+              <button id="aec-toggle" onclick="toggleAEC(this)" aria-checked="true"
+                class="tactile-btn w-12 h-6 rounded-full bg-toxic p-0.5 transition-colors relative flex items-center shadow-toxic-sm">
+                <span id="aec-knob"
+                  class="w-5 h-5 rounded-full bg-black shadow-md translate-x-6 transition-transform"></span>
+              </button>
+            </div>
+            <!-- VAD Sensitivity -->
+            <div class="space-y-2 pt-2">
+              <span class="text-xs font-mono text-foreground-white uppercase font-semibold">VAD Neural Trigger
+                Sensitivity</span>
+              <div class="grid grid-cols-3 gap-2.5">
+                <button onclick="setVAD('RELAXED', this)"
+                  class="vad-btn tactile-btn py-2.5 rounded-xl bg-surface-card-high border border-toxic/40 text-toxic font-mono text-xs font-bold">RELAXED</button>
+                <button onclick="setVAD('BALANCED', this)"
+                  class="vad-btn tactile-btn py-2.5 rounded-xl bg-surface-dim border border-white/5 text-foreground-muted font-mono text-xs">BALANCED</button>
+                <button onclick="setVAD('AGGRESSIVE', this)"
+                  class="vad-btn tactile-btn py-2.5 rounded-xl bg-surface-dim border border-white/5 text-foreground-muted font-mono text-xs">AGGRESSIVE</button>
+              </div>
+            </div>
+          </div>
+          <!-- Right: Physical Expressiveness & Eye Engine Controls -->
+          <div class="p-5 md:p-6 rounded-3xl bg-surface-card border border-white/5 shadow-2xl space-y-6">
+            <div class="flex items-center gap-2.5">
+              <span class="material-symbols-outlined text-toxic text-[22px]">visibility</span>
+              <h2 class="font-headline text-lg uppercase text-foreground-white font-bold tracking-wide">Expression & Eye
+                Engine</h2>
+            </div>
+            <!-- Blink Cadence Slider -->
+            <div class="space-y-2.5">
+              <div class="flex justify-between items-center text-xs md:text-sm font-mono">
+                <span class="text-foreground-white uppercase">Organic Blink Cadence</span>
+                <span id="blink-display" class="text-toxic font-bold glow-text-toxic">2.4 sec</span>
+              </div>
+              <input type="range" min="1.0" max="5.0" step="0.1" value="2.4" oninput="updateBlinkCadence(this.value)"
+                class="w-full h-2 cursor-pointer">
+              <div class="flex justify-between text-[10px] font-mono text-foreground-dim">
+                <span>RAPID (1.0s)</span>
+                <span>CALM (5.0s)</span>
+              </div>
+            </div>
+            <!-- Gaze Damping Dynamics -->
+            <div class="space-y-2.5 pt-2">
+              <span class="text-xs md:text-sm font-mono text-foreground-white uppercase font-semibold">Gaze Interpolation
+                Dynamics</span>
+              <div class="grid grid-cols-3 gap-2.5">
+                <button onclick="setGazeMode(this)"
+                  class="gaze-btn tactile-btn py-2.5 rounded-xl bg-surface-card-high border border-toxic/40 text-toxic font-mono text-xs font-bold">SNAP
+                  INSTANT</button>
+                <button onclick="setGazeMode(this)"
+                  class="gaze-btn tactile-btn py-2.5 rounded-xl bg-surface-dim border border-white/5 text-foreground-muted font-mono text-xs">ORGANIC
+                  DAMP</button>
+                <button onclick="setGazeMode(this)"
+                  class="gaze-btn tactile-btn py-2.5 rounded-xl bg-surface-dim border border-white/5 text-foreground-muted font-mono text-xs">LAZY
+                  DRIFT</button>
+              </div>
+            </div>
+            <!-- OLED Luminescence -->
+            <div class="space-y-2.5 pt-2">
+              <div class="flex justify-between items-center text-xs md:text-sm font-mono">
+                <span class="text-foreground-white uppercase">OLED Display Luminescence</span>
+                <span id="oled-val" class="text-toxic font-bold glow-text-toxic">85% PWM</span>
+              </div>
+              <input type="range" min="10" max="100" step="1" value="85" oninput="updateOledBrightness(this.value)"
+                class="w-full h-2 cursor-pointer">
+              <div class="flex justify-between text-[10px] font-mono text-foreground-dim">
+                <span>STEALTH (10%)</span>
+                <span>OVERDRIVE (100%)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- ======================================================================= -->
+      <!-- SCREEN 3: HARDWARE STORE / ORDER PC-01                                  -->
+      <!-- ======================================================================= -->
+      <section id="screen-store" class="screen-view flex-col space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div>
+            <h1 class="font-headline text-3xl md:text-4xl uppercase font-bold text-foreground-white tracking-tight">
+              HARDWARE STORE</h1>
+            <p class="font-body text-sm text-foreground-muted">Reserve pre-assembled PC-01 Companion nodes and modular
+              expansion packs.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-toxic animate-ping shadow-toxic-sm"></span>
+          </div>
+        </div>
+        <!-- Store Showcase: 2-Columns on Desktop -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full items-start">
+          <!-- Left: 3D Robot Specimen Display Stage (5 Col on PC) -->
+          <div
+            class="lg:col-span-5 rounded-3xl bg-surface-card p-6 border border-toxic/20 shadow-2xl flex flex-col items-center justify-center relative overflow-hidden">
+            <div class="crt-overlay absolute inset-0"></div>
+            <div class="flex items-center justify-between w-full mb-4 text-xs font-mono z-10">
+              <span class="px-3 py-1 rounded-md bg-surface-dim border border-toxic/30 text-toxic font-bold">REV 2.4</span>
+              <span class="text-foreground-dim uppercase">3D PREVIEW</span>
+            </div>
+            <!-- 3D Graphic Container -->
+            <div id="product-preview"
+              class="relative w-48 h-48 md:w-56 md:h-56 flex items-center justify-center transition-transform duration-500 hover:scale-105 my-4">
+              <div id="product-chassis"
+                class="w-36 h-40 md:w-44 md:h-48 rounded-[36px] bg-[#00ff66] shadow-[0_25px_50px_rgba(0,0,0,0.95),0_0_30px_rgba(0,255,102,0.5)] border border-white/20 flex flex-col items-center justify-center p-3 relative transition-all duration-300">
+                <!-- Visor -->
+                <div
+                  class="w-full h-18 md:h-22 rounded-2xl bg-black flex items-center justify-center gap-4 border border-toxic/40 shadow-inner">
+                  <div class="w-5 h-8 rounded-full bg-toxic shadow-[0_0_12px_#00ff66] animate-pulse"></div>
+                  <div class="w-5 h-8 rounded-full bg-toxic shadow-[0_0_12px_#00ff66] animate-pulse"></div>
+                </div>
+                <!-- Speaker Grille -->
+                <div class="flex gap-2 mt-4">
+                  <span class="w-2 h-2 rounded-full bg-black/60"></span>
+                  <span class="w-2 h-2 rounded-full bg-black/60"></span>
+                  <span class="w-2 h-2 rounded-full bg-black/60"></span>
+                </div>
+              </div>
+            </div>
+            <div class="font-mono text-xs text-foreground-dim flex items-center gap-2 mt-2 z-10">
+            </div>
+          </div>
+          <!-- Right: Pricing, Finish Swatches & Reservation CTA (7 Col on PC) -->
+          <div class="lg:col-span-7 rounded-3xl bg-surface-card p-6 border border-white/5 shadow-2xl space-y-6">
+            <div class="flex items-baseline justify-between border-b border-white/5 pb-4">
+              <div>
+                <h2 class="font-headline text-2xl uppercase text-foreground-white font-bold">PC-01 POCKET COMPANION</h2>
+                <p class="text-sm text-foreground-muted mt-1">ESP32-S3 Dual-Core · Bio-OLED · I2S Speaker · LiPo 1200mAh
+                </p>
+              </div>
+              <div class="text-right">
+                <span class="font-headline text-3xl md:text-4xl text-toxic font-bold glow-text-toxic">$89.00</span>
+              </div>
+            </div>
+            <!-- Shell Finish Selector -->
+            <div class="space-y-3">
+              <div class="flex items-center justify-between text-xs md:text-sm font-mono">
+                <span class="text-foreground-dim uppercase">CHASSIS SHELL FINISH</span>
+                <span id="selected-finish-name" class="text-toxic font-bold">TOXIC GREEN</span>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <!-- Toxic Green -->
+                <button onclick="selectFinish('TOXIC GREEN', 'toxic', this)"
+                  class="finish-pill tactile-btn p-3 rounded-2xl bg-surface-dim border-2 border-toxic flex flex-col items-center gap-2 shadow-toxic-sm">
+                  <div class="w-5 h-5 rounded-full bg-[#00ff66] shadow-[0_0_8px_#00ff66]"></div>
+                  <span class="text-xs font-mono text-foreground-white font-bold">TOXIC</span>
+                </button>
+                <!-- Obsidian -->
+                <button onclick="selectFinish('OBSIDIAN BLACK', 'obsidian', this)"
+                  class="finish-pill tactile-btn p-3 rounded-2xl bg-surface-dim border border-white/5 flex flex-col items-center gap-2">
+                  <div class="w-5 h-5 rounded-full bg-[#121317] border border-white/20"></div>
+                  <span class="text-xs font-mono text-foreground-muted">OBSIDIAN</span>
+                </button>
+                <!-- Cloud Gray -->
+                <button onclick="selectFinish('CLOUD GRAY', 'cloud', this)"
+                  class="finish-pill tactile-btn p-3 rounded-2xl bg-surface-dim border border-white/5 flex flex-col items-center gap-2">
+                  <div class="w-5 h-5 rounded-full bg-[#D7D4CD]"></div>
+                  <span class="text-xs font-mono text-foreground-muted">CLOUD</span>
+                </button>
+                <!-- Lilac -->
+                <button onclick="selectFinish('LILAC BIO', 'lilac', this)"
+                  class="finish-pill tactile-btn p-3 rounded-2xl bg-surface-dim border border-white/5 flex flex-col items-center gap-2">
+                  <div class="w-5 h-5 rounded-full bg-[#8C72A8]"></div>
+                  <span class="text-xs font-mono text-foreground-muted">LILAC</span>
+                </button>
+              </div>
+            </div>
+            <!-- Quantity Stepper & Reserve Button -->
+            <div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
+              <!-- Stepper -->
+              <div
+                class="flex items-center w-full sm:w-auto bg-surface-dim rounded-2xl p-1.5 border border-white/5 justify-between">
+                <button onclick="adjustHeroQty(-1)"
+                  class="tactile-btn w-10 h-12 rounded-xl bg-surface-card text-foreground-white flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[18px]">remove</span>
+                </button>
+                <span id="hero-qty" class="w-12 text-center font-mono text-base font-bold text-foreground-white">1</span>
+                <button onclick="adjustHeroQty(1)"
+                  class="tactile-btn w-10 h-12 rounded-xl bg-surface-card text-foreground-white flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[18px]">add</span>
+                </button>
+              </div>
+              <!-- Reserve Unit Button -->
+              <button onclick="addToCartKit('PC-01 POCKET COMPANION', 89)"
+                class="tactile-btn w-full flex-1 py-4 px-6 rounded-2xl bg-toxic text-black font-headline text-base uppercase font-bold tracking-wider flex items-center justify-center gap-2.5 shadow-toxic-md">
+                <span class="material-symbols-outlined text-[20px]">lock_open</span>
+                <span>RESERVE ONE..</span>
+              </button>
+            </div>
+            <!-- Pincode Check -->
+            <div class="flex items-center gap-2.5 p-2.5 bg-surface-dim rounded-2xl border border-white/5">
+              <div class="flex items-center gap-2.5 flex-1 px-3">
+                <span class="material-symbols-outlined text-[18px] text-toxic">pin_drop</span>
+                <input type="text" placeholder="ENTER ZIP / PINCODE FOR DELIVERY ESTIMATE" maxlength="6"
+                  class="bg-transparent font-mono text-xs md:text-sm text-foreground-white placeholder:text-foreground-dim outline-none w-full uppercase">
+              </div>
+              <button onclick="checkPincode(this)"
+                class="tactile-btn px-5 py-2.5 rounded-xl bg-surface-card text-toxic font-mono text-xs font-bold border border-toxic/20">
+                CHECK
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- ======================================================================= -->
+      <!-- SCREEN 4: PAIR NODE & ESP32-S3 WI-FI MANAGER                            -->
+      <!-- ======================================================================= -->
+      <section id="screen-pair" class="screen-view flex-col space-y-6">
+        <div>
+          <h1 class="font-headline text-3xl md:text-4xl uppercase font-bold text-foreground-white tracking-tight">ADD A
+            BUDDY..</h1>
+          <p class="font-body text-sm text-foreground-muted">Configure and link your ESP32-S3 companion over local Wi-Fi /
+            WebSockets.</p>
+        </div>
+        <!-- 2-Columns on Tablet & Desktop -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full items-start">
+          <!-- Left: Direct IP WebSocket Card -->
+          <div class="p-6 rounded-3xl bg-surface-card border border-toxic/30 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="material-symbols-outlined text-toxic text-[22px]">router</span>
+                <span class="font-mono text-sm text-foreground-white font-bold uppercase tracking-wider">ESP32-S3 WI-FI
+                  LINK</span>
+              </div>
+              <span id="socket-badge"
+                class="px-2.5 py-1 rounded-md text-[10px] font-mono font-bold bg-toxic/20 text-toxic border border-toxic/40">STANDALONE</span>
+            </div>
+            <p class="text-xs md:text-sm text-foreground-muted leading-relaxed">
+              Enter your ESP32-S3 IP address to stream physical battery levels, microphone activity, and send wireless
+              on/off power toggles.
+            </p>
+            <div class="space-y-1.5 pt-2">
+              <label class="text-xs font-mono text-foreground-dim uppercase font-semibold">ESP32 IP ADDRESS OR
+                HOSTNAME</label>
+              <div
+                class="flex items-center px-4 py-3 rounded-2xl bg-surface-dim border border-white/5 focus-within:border-toxic/50">
+                <span class="material-symbols-outlined text-[18px] text-toxic mr-2.5">lan</span>
+                <input id="esp-ip-input" type="text" value="192.168.1.100"
+                  placeholder="e.g. 192.168.1.100 or ultron.local"
+                  class="w-full bg-transparent text-foreground-white font-mono text-sm focus:outline-none">
+              </div>
+            </div>
+            <button onclick="connectToESP32()" id="connect-esp-btn"
+              class="tactile-btn w-full py-4 px-6 rounded-2xl bg-toxic text-black font-headline text-base font-bold uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-toxic-sm mt-2">
+              <span class="material-symbols-outlined text-[20px]">wifi_tethering</span>
+              <span>CONNECT LIVE NODE</span>
+            </button>
+          </div>
+          <!-- Right: 6-Digit Hardware Binding PIN -->
+          <div class="p-6 rounded-3xl bg-surface-card border border-white/5 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-sm text-foreground-white font-bold uppercase tracking-wider">HARDWARE BINDING
+                KEY</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-toxic animate-pulse"></span>
+            </div>
+            <p class="text-xs md:text-sm text-foreground-muted">
+              Enter the 6-digit key displayed on the PC-01 OLED screen upon boot.
+            </p>
+            <!-- 6 Tactile PIN Inputs -->
+            <div class="flex items-center justify-between gap-2 py-3" id="pin-container">
+              <input maxlength="1" type="text" value="7"
+                class="pin-box w-12 md:w-14 h-14 md:h-16 text-center rounded-2xl bg-surface-dim text-foreground-white font-mono text-xl font-bold shadow-inner border border-white/5 focus:border-toxic focus:outline-none transition-all">
+              <input maxlength="1" type="text" value="4"
+                class="pin-box w-12 md:w-14 h-14 md:h-16 text-center rounded-2xl bg-surface-dim text-foreground-white font-mono text-xl font-bold shadow-inner border border-white/5 focus:border-toxic focus:outline-none transition-all">
+              <input maxlength="1" type="text" value="9"
+                class="pin-box w-12 md:w-14 h-14 md:h-16 text-center rounded-2xl bg-surface-dim text-foreground-white font-mono text-xl font-bold shadow-inner border border-white/5 focus:border-toxic focus:outline-none transition-all">
+              <input maxlength="1" type="text" placeholder="·"
+                class="pin-box w-12 md:w-14 h-14 md:h-16 text-center rounded-2xl bg-surface-dim text-toxic font-mono text-xl font-bold shadow-toxic-sm border border-toxic/40 focus:outline-none transition-all">
+              <input maxlength="1" type="text" placeholder="·"
+                class="pin-box w-12 md:w-14 h-14 md:h-16 text-center rounded-2xl bg-surface-dim text-foreground-dim font-mono text-xl font-bold shadow-inner border border-white/5 focus:border-toxic focus:outline-none transition-all">
+              <input maxlength="1" type="text" placeholder="·"
+                class="pin-box w-12 md:w-14 h-14 md:h-16 text-center rounded-2xl bg-surface-dim text-foreground-dim font-mono text-xl font-bold shadow-inner border border-white/5 focus:border-toxic focus:outline-none transition-all">
+            </div>
+            <!-- QR Scan Trigger Button -->
+            <button onclick="simulateQRScan(this)"
+              class="tactile-btn w-full py-3.5 px-4 rounded-2xl bg-surface-dim hover:bg-surface-card-high text-foreground-white flex items-center justify-center gap-2.5 border border-white/5 text-xs font-mono font-medium transition-all">
+              <span class="material-symbols-outlined text-[18px] text-toxic">qr_code_scanner</span>
+              <span>SCAN QR FROM QUICKSTART CARD</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+    <!-- ========================================================================= -->
+    <!-- TOAST NOTIFICATION POPUP -->
+    <!-- ========================================================================= -->
+    <div id="cart-toast"
+      class="fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 w-11/12 max-w-sm bg-surface-card/95 backdrop-blur-2xl border border-toxic/40 rounded-2xl p-3.5 shadow-toxic-lg flex items-center justify-between gap-3 z-50 pointer-events-none opacity-0 translate-y-4 transition-all duration-300">
+      <div class="flex items-center gap-3">
+        <div
+          class="w-8 h-8 rounded-full bg-toxic flex items-center justify-center text-black shadow-toxic-sm flex-shrink-0">
+          <span class="material-symbols-outlined text-[18px] font-bold">done</span>
+        </div>
+        <div class="flex flex-col">
+          <span id="toast-title" class="font-mono text-xs text-foreground-white font-bold uppercase">PART ALLOCATED</span>
+          <span class="font-mono text-[10px] text-foreground-dim">Hardware staging buffer updated</span>
+        </div>
+      </div>
+      <span
+        class="font-mono text-[10px] text-toxic font-bold px-2 py-1 bg-surface-dim rounded-md uppercase border border-toxic/30 flex-shrink-0">CONFIRMED</span>
+    </div>
+    <!-- ========================================================================= -->
+    <!-- MOBILE BOTTOM NAVIGATION DOCK (ONLY VISIBLE ON MOBILE: hidden on md+) -->
+    <!-- ========================================================================= -->
+    <nav class="fixed bottom-0 left-0 right-0 z-50 pointer-events-none select-none pb-2 md:hidden">
+      <div
+        class="mx-3 rounded-t-[36px] rounded-b-[28px] bg-gradient-to-b from-[#141820] via-[#0c0f14] to-[#060709] border-t border-x border-white/10 shadow-[0_-15px_40px_rgba(0,0,0,0.95)] px-6 pt-3 pb-3 pointer-events-auto relative">
+        <!-- Central Mobile Power Switch Button -->
+        <div class="absolute -top-6 left-1/2 -translate-x-1/2 z-10">
+          <button onclick="toggleSystemPower()" aria-label="Core Power Switch"
+            class="group relative w-14 h-14 rounded-full flex items-center justify-center bg-gradient-to-b from-[#222936] to-[#0c0f14] p-[3px] shadow-[0_12px_30px_rgba(0,0,0,0.9),0_0_15px_rgba(0,255,102,0.3)] active:scale-90 transition-transform duration-150">
+            <div
+              class="w-full h-full rounded-full bg-gradient-to-b from-[#161c26] to-[#0a0d12] flex flex-col items-center justify-center relative border border-toxic/30 shadow-inner">
+              <span id="power-led" class="w-2 h-2 rounded-full bg-toxic shadow-[0_0_10px_#00ff66] mb-0.5"></span>
+              <span class="material-symbols-outlined text-white text-[20px] font-light">power_settings_new</span>
+            </div>
+          </button>
+        </div>
+        <!-- Mobile Navigation Icons -->
+        <div class="flex items-center justify-between h-14">
+          <!-- Home -->
+          <button onclick="switchScreen('home')" aria-label="Home" id="nav-btn-home"
+            class="tactile-btn w-12 h-12 rounded-full bg-surface-card border border-white/5 flex items-center justify-center text-toxic shadow-md">
+            <span class="material-symbols-outlined text-[22px]">home</span>
+          </button>
+          <div class="w-16 h-12"></div>
+          <!-- Menu Popover Trigger -->
+          <div class="relative flex items-center justify-center">
+            <div id="nav-tactile-menu"
+              class="hidden absolute bottom-16 right-0 w-52 rounded-2xl bg-surface-card border border-toxic/30 shadow-[0_15px_40px_rgba(0,0,0,0.95)] p-2 flex flex-col gap-1 z-50 backdrop-blur-2xl">
+              <div class="px-2 py-1 flex items-center justify-between border-b border-white/5 mb-1">
+                <span class="font-mono text-[9px] text-foreground-dim uppercase tracking-wider">Tactical Navigation</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-toxic animate-pulse"></span>
+              </div>
+              <button onclick="switchScreen('store'); toggleTactileMenu();"
+                class="tactile-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-xl bg-surface-dim hover:bg-surface-card-high text-foreground-white text-left transition-colors">
+                <div
+                  class="w-7 h-7 rounded-lg bg-surface-black flex items-center justify-center text-toxic border border-white/5">
+                  <span class="material-symbols-outlined text-[16px]">shopping_bag</span>
+                </div>
+                <div class="flex flex-col">
+                  <span class="font-headline text-xs font-bold">Store</span>
+                  <span class="font-mono text-[9px] text-foreground-dim">Hardware & Mods</span>
+                </div>
+              </button>
+              <button onclick="switchScreen('tuner'); toggleTactileMenu();"
+                class="tactile-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-xl bg-surface-dim hover:bg-surface-card-high text-foreground-white text-left transition-colors">
+                <div
+                  class="w-7 h-7 rounded-lg bg-surface-black flex items-center justify-center text-toxic border border-white/5">
+                  <span class="material-symbols-outlined text-[16px]">tune</span>
+                </div>
+                <div class="flex flex-col">
+                  <span class="font-headline text-xs font-bold">Tuner</span>
+                  <span class="font-mono text-[9px] text-foreground-dim">Sensors & Audio</span>
+                </div>
+              </button>
+              <button onclick="switchScreen('pair'); toggleTactileMenu();"
+                class="tactile-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-xl bg-surface-dim hover:bg-surface-card-high text-foreground-white text-left transition-colors">
+                <div
+                  class="w-7 h-7 rounded-lg bg-surface-black flex items-center justify-center text-toxic border border-white/5">
+                  <span class="material-symbols-outlined text-[16px]">wifi_tethering</span>
+                </div>
+                <div class="flex flex-col">
+                  <span class="font-headline text-xs font-bold">ESP32 Link</span>
+                  <span class="font-mono text-[9px] text-foreground-dim">Wi-Fi Bus Connect</span>
+                </div>
+              </button>
+            </div>
+            <button onclick="toggleTactileMenu(event)" id="nav-menu-btn"
+              class="tactile-btn w-12 h-12 rounded-full bg-surface-card border border-white/5 flex items-center justify-center text-foreground-muted hover:text-white shadow-md">
+              <span class="material-symbols-outlined text-[22px]">sort</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <!-- ========================================================================= -->
+    <!-- RESPONSIVE SCRIPT & WEBSOCKET ENGINE -->
+    <!-- ========================================================================= -->
+    <script>
+      // State
+      let currentScreen = 'home';
+      let cartCount = 0;
+      let heroQuantity = 1;
+      let currentExpression = 'idle';
+      let isBlinking = false;
+      let blinkTimer = null;
+      let isPoweredOn = true;
+      let espSocket = null;
+      let blinkIntervalSeconds = 2.4;
+      // Robot Expression Configs
+      const expressions = {
+        idle: {
+          label: 'ATTENTIVE / IDLE',
+          eyeLClass: 'relative w-16 md:w-20 h-24 md:h-28 rounded-full bg-gradient-to-b from-[#e6fff0] via-[#00ff66] to-[#009933] p-1 flex items-center justify-center shadow-[inset_0_0_15px_rgba(255,255,255,0.9),0_0_30px_rgba(0,255,102,0.85)]',
+          eyeRClass: 'relative w-16 md:w-20 h-24 md:h-28 rounded-full bg-gradient-to-b from-[#e6fff0] via-[#00ff66] to-[#009933] p-1 flex items-center justify-center shadow-[inset_0_0_15px_rgba(255,255,255,0.9),0_0_30px_rgba(0,255,102,0.85)]',
+          rotL: 0,
+          rotR: 0,
+          msg: 'EMOTE_CHIP_00: Toxic bio-sensor synchronized.'
+        },
+        happy: {
+          label: 'AFFIRMATIVE / HAPPY',
+          eyeLClass: 'relative w-16 md:w-20 h-14 md:h-16 rounded-t-[36px] rounded-b-[10px] bg-gradient-to-b from-[#e6fff0] via-[#00ff66] to-[#009933] p-1 flex items-center justify-center shadow-[inset_0_0_15px_rgba(255,255,255,0.9),0_0_35px_rgba(0,255,102,0.95)]',
+          eyeRClass: 'relative w-16 md:w-20 h-14 md:h-16 rounded-t-[36px] rounded-b-[10px] bg-gradient-to-b from-[#e6fff0] via-[#00ff66] to-[#009933] p-1 flex items-center justify-center shadow-[inset_0_0_15px_rgba(255,255,255,0.9),0_0_35px_rgba(0,255,102,0.95)]',
+          rotL: -4,
+          rotR: 4,
+          msg: 'EMOTE_CHIP_01: Endorphin loop engaged.'
+        },
+        sleepy: {
+          label: 'DORMANT / SLEEPY',
+          eyeLClass: 'relative w-16 md:w-20 h-8 md:h-9 rounded-full bg-gradient-to-b from-[#b3ffcc] via-[#00cc52] to-[#006629] p-0.5 flex items-center justify-center shadow-[inset_0_0_10px_rgba(255,255,255,0.5),0_0_20px_rgba(0,255,102,0.5)] opacity-80',
+          eyeRClass: 'relative w-16 md:w-20 h-8 md:h-9 rounded-full bg-gradient-to-b from-[#b3ffcc] via-[#00cc52] to-[#006629] p-0.5 flex items-center justify-center shadow-[inset_0_0_10px_rgba(255,255,255,0.5),0_0_20px_rgba(0,255,102,0.5)] opacity-80',
+          rotL: 0,
+          rotR: 0,
+          msg: 'EMOTE_CHIP_02: Clocks dropped to 40MHz standby.'
+        },
+        curious: {
+          label: 'ANALYZING / CURIOUS',
+          eyeLClass: 'relative w-15 md:w-18 h-20 md:h-24 rounded-[32px] bg-gradient-to-b from-[#e6fff0] via-[#00ff66] to-[#009933] p-1 flex items-center justify-center shadow-[0_0_30px_rgba(0,255,102,0.85)]',
+          eyeRClass: 'relative w-17 md:w-20 h-26 md:h-30 rounded-[24px] bg-gradient-to-b from-[#e6fff0] via-[#00ff66] to-[#009933] p-1 flex items-center justify-center shadow-[0_0_32px_rgba(0,255,102,0.9)]',
+          rotL: -9,
+          rotR: 11,
+          msg: 'EMOTE_CHIP_03: Query vector scanning environment.'
+        },
+        excited: {
+          label: 'OVERDRIVE / EXCITED',
+          eyeLClass: 'relative w-17 md:w-20 h-26 md:h-30 rounded-full bg-gradient-to-b from-[#ffffff] via-[#39ff14] to-[#00ff66] p-1 flex items-center justify-center shadow-[inset_0_0_18px_rgba(255,255,255,1),0_0_40px_#39ff14]',
+          eyeRClass: 'relative w-17 md:w-20 h-26 md:h-30 rounded-full bg-gradient-to-b from-[#ffffff] via-[#39ff14] to-[#00ff66] p-1 flex items-center justify-center shadow-[inset_0_0_18px_rgba(255,255,255,1),0_0_40px_#39ff14]',
+          rotL: -3,
+          rotR: 3,
+          msg: 'EMOTE_CHIP_04: High gain tactile response active.'
+        }
+      };
+      // Responsive Screen Switcher (Syncs Mobile & Desktop Header Tabs)
+      function switchScreen(screenId) {
+        document.querySelectorAll('.screen-view').forEach(p => p.classList.remove('active-screen'));
+        const target = document.getElementById('screen-' + screenId);
+        if (target) {
+          target.classList.add('active-screen');
+          currentScreen = screenId;
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        // Sync Mobile Nav
+        const homeBtn = document.getElementById('nav-btn-home');
+        if (homeBtn) {
+          if (screenId === 'home') {
+            homeBtn.classList.add('text-toxic');
+            homeBtn.classList.remove('text-foreground-muted');
+          } else {
+            homeBtn.classList.remove('text-toxic');
+            homeBtn.classList.add('text-foreground-muted');
+          }
+        }
+        // Sync Desktop Tabs
+        document.querySelectorAll('.desk-nav-btn').forEach(btn => {
+          btn.classList.remove('bg-toxic', 'text-black', 'shadow-toxic-sm');
+          btn.classList.add('text-foreground-muted');
+        });
+        const activeDeskTab = document.getElementById('desk-tab-' + screenId);
+        if (activeDeskTab) {
+          activeDeskTab.classList.remove('text-foreground-muted');
+          activeDeskTab.classList.add('bg-toxic', 'text-black', 'shadow-toxic-sm');
+        }
+      }
+      function toggleTactileMenu(e) {
+        if (e) e.stopPropagation();
+        const menu = document.getElementById('nav-tactile-menu');
+        const btn = document.getElementById('nav-menu-btn');
+        if (!menu) return;
+        menu.classList.toggle('hidden');
+        btn.classList.toggle('text-toxic');
+      }
+      document.addEventListener('click', (e) => {
+        const menu = document.getElementById('nav-tactile-menu');
+        const btn = document.getElementById('nav-menu-btn');
+        if (menu && !menu.contains(e.target) && !btn.contains(e.target)) {
+          menu.classList.add('hidden');
+          btn.classList.remove('text-toxic');
+        }
+      });
+      // Robot Expression Changer
+      function setExpression(key, btnElement) {
+        const config = expressions[key];
+        if (!config) return;
+        currentExpression = key;
+        document.getElementById('mood-label').innerText = config.label;
+        document.getElementById('console-line').innerText = config.msg;
+        const eyeL = document.getElementById('eye-l');
+        const eyeR = document.getElementById('eye-r');
+        eyeL.className = config.eyeLClass;
+        eyeR.className = config.eyeRClass;
+        applyWrapTransform(1);
+        document.querySelectorAll('.mood-chip').forEach(btn => {
+          btn.className = 'mood-chip tactile-btn px-3.5 py-2 rounded-xl bg-surface-card text-foreground-muted hover:text-white border border-white/5 flex items-center gap-1.5 flex-shrink-0 text-xs font-mono font-medium transition-all';
+          const dot = btn.querySelector('span');
+          if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-foreground-dim';
+        });
+        if (btnElement) {
+          btnElement.className = 'mood-chip tactile-btn px-3.5 py-2 rounded-xl bg-toxic text-black font-mono font-bold flex items-center gap-1.5 flex-shrink-0 text-xs shadow-toxic-sm transition-all';
+          const dot = btnElement.querySelector('span');
+          if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-black';
+        }
+        triggerSingleBlink(true);
+        sendEspCommand({ command: "SET_MOOD", mood: key });
+      }
+      function applyWrapTransform(scaleY = 1) {
+        const config = expressions[currentExpression] || expressions.idle;
+        const eyeWrapL = document.getElementById('eye-wrap-l');
+        const eyeWrapR = document.getElementById('eye-wrap-r');
+        if (eyeWrapL && eyeWrapR) {
+          eyeWrapL.style.transform = `scaleY(${scaleY}) rotate(${config.rotL}deg)`;
+          eyeWrapR.style.transform = `scaleY(${scaleY}) rotate(${config.rotR}deg)`;
+        }
+      }
+      function triggerSingleBlink(isDirect = false) {
+        if (isBlinking && !isDirect) return;
+        isBlinking = true;
+        applyWrapTransform(0.08);
+        setTimeout(() => {
+          applyWrapTransform(1.0);
+          setTimeout(() => { isBlinking = false; }, 80);
+        }, 95);
+      }
+      function scheduleNextBlink() {
+        clearTimeout(blinkTimer);
+        const nextInterval = Math.floor(Math.random() * (blinkIntervalSeconds * 1000)) + 1800;
+        blinkTimer = setTimeout(() => {
+          triggerSingleBlink();
+          scheduleNextBlink();
+        }, nextInterval);
+      }
+      function updateBlinkCadence(val) {
+        blinkIntervalSeconds = parseFloat(val);
+        document.getElementById('blink-display').innerText = blinkIntervalSeconds.toFixed(1) + ' sec';
+        scheduleNextBlink();
+      }
+      function updateOledBrightness(val) {
+        document.getElementById('oled-val').innerText = val + '% PWM';
+        const oled = document.getElementById('oled-stage');
+        oled.style.opacity = (val / 100) * 0.4 + 0.6;
+      }
+      // Gaze Tracking within stage
+      const oledStage = document.getElementById('oled-stage');
+      if (oledStage) {
+        oledStage.addEventListener('mousemove', (e) => {
+          const rect = oledStage.getBoundingClientRect();
+          const x = (e.clientX - rect.left) / rect.width - 0.5;
+          const y = (e.clientY - rect.top) / rect.height - 0.5;
+          const pupilL = document.getElementById('pupil-l');
+          const pupilR = document.getElementById('pupil-r');
+          if (pupilL && pupilR) {
+            pupilL.style.transform = `translate(${x * 14}px, ${y * 10}px)`;
+            pupilR.style.transform = `translate(${x * 14}px, ${y * 10}px)`;
+          }
+        });
+        oledStage.addEventListener('mouseleave', () => {
+          const pupilL = document.getElementById('pupil-l');
+          const pupilR = document.getElementById('pupil-r');
+          if (pupilL && pupilR) {
+            pupilL.style.transform = 'translate(0px, 0px)';
+            pupilR.style.transform = 'translate(0px, 0px)';
+          }
+        });
+        oledStage.addEventListener('pointerdown', () => {
+          applyWrapTransform(0.12);
+          document.getElementById('console-line').innerText = 'CAPACITIVE_TOUCH: Optic lens petted.';
+          showToast('CAPACITIVE TOUCH DETECTED');
+          setTimeout(() => { applyWrapTransform(1.0); }, 180);
+        });
+      }
+      // Power Toggle Control
+      function toggleSystemPower() {
+        isPoweredOn = !isPoweredOn;
+        const led = document.getElementById('power-led');
+        const statusIndicator = document.getElementById('header-connection-status');
+        if (isPoweredOn) {
+          if (led) led.className = 'w-2 h-2 rounded-full bg-toxic shadow-[0_0_10px_#00ff66] mb-0.5';
+          statusIndicator.innerText = 'ONLINE';
+          statusIndicator.className = 'font-mono text-[10px] text-toxic uppercase font-semibold tracking-wider';
+          document.getElementById('console-line').innerText = 'POWER: Node woke from low-power state.';
+          setExpression('idle');
+        } else {
+          if (led) led.className = 'w-2 h-2 rounded-full bg-red-500 shadow-[0_0_10px_#ef4444] mb-0.5';
+          statusIndicator.innerText = 'STANDBY';
+          statusIndicator.className = 'font-mono text-[10px] text-foreground-dim uppercase font-semibold tracking-wider';
+          document.getElementById('console-line').innerText = 'POWER: Node entering deep sleep.';
+          setExpression('sleepy');
+        }
+        sendEspCommand({ command: "SET_POWER", state: isPoweredOn });
+      }
+      function triggerExplodeSchematic() {
+        showToast('EXPLODING 3D SCHEMATIC');
+        document.getElementById('console-line').innerText = 'DIAG: ESP32-S3 / OLED / MAX98357A / LiPo 1200mAh exploded.';
+      }
+      function triggerDiagnosticPing() {
+        showToast('I2C & SPI BUS NOMINAL // 0 ERRORS');
+        document.getElementById('console-line').innerText = 'I2C SCAN: 0x3C (OLED) ACK | 0x68 (IMU) ACK | Frame Rate: 60fps';
+        triggerSingleBlink(true);
+      }
+      function triggerSpeechSynth() {
+        showToast('SPEECH SYNTH: "ULTRON ONLINE"');
+        document.getElementById('console-line').innerText = 'I2S_DAC: Playing 16-bit 44.1kHz audio frame buffer.';
+        const eyeWrapL = document.getElementById('eye-wrap-l');
+        const eyeWrapR = document.getElementById('eye-wrap-r');
+        eyeWrapL.style.transform = 'scale(1.25)';
+        eyeWrapR.style.transform = 'scale(1.25)';
+        setTimeout(() => {
+          applyWrapTransform(1.0);
+          triggerSingleBlink(true);
+        }, 550);
+      }
+      // Hardware Tuner Logic
+      function setHardwareGain(gainStr, btn) {
+        document.getElementById('selected-hw-gain').innerText = '+' + gainStr;
+        document.getElementById('gain-db-display').innerText = '+' + gainStr.replace('dB', '') + '.0 dB';
+        const arc = document.getElementById('gain-meter-arc');
+        const val = parseInt(gainStr);
+        const pct = Math.max(0.1, val / 24);
+        arc.style.strokeDashoffset = (238.7 - (pct * 160)).toFixed(1);
+        document.querySelectorAll('.hw-step-btn').forEach(b => {
+          b.className = 'hw-step-btn tactile-btn py-2.5 rounded-xl bg-surface-card-high text-xs font-mono font-medium hover:border-toxic/30 border border-white/5 transition-all';
+        });
+        btn.className = 'hw-step-btn tactile-btn py-2.5 rounded-xl bg-toxic text-black font-mono text-xs font-bold shadow-toxic-sm';
+        sendEspCommand({ command: "SET_GAIN", gain: val });
+      }
+      function toggleAEC(btn) {
+        const knob = document.getElementById('aec-knob');
+        const isChecked = btn.getAttribute('aria-checked') === 'true';
+        if (isChecked) {
+          btn.setAttribute('aria-checked', 'false');
+          btn.className = 'tactile-btn w-12 h-6 rounded-full bg-surface-card-highest p-0.5 transition-colors relative flex items-center border border-white/10';
+          knob.classList.remove('translate-x-6');
+          knob.classList.add('translate-x-0');
+          showToast('ECHO CANCELLATION DISABLED');
+        } else {
+          btn.setAttribute('aria-checked', 'true');
+          btn.className = 'tactile-btn w-12 h-6 rounded-full bg-toxic p-0.5 transition-colors relative flex items-center shadow-toxic-sm';
+          knob.classList.remove('translate-x-0');
+          knob.classList.add('translate-x-6');
+          showToast('ECHO CANCELLATION ACTIVE');
+        }
+      }
+      function setVAD(mode, btn) {
+        document.querySelectorAll('.vad-btn').forEach(b => {
+          b.className = 'vad-btn tactile-btn py-2.5 rounded-xl bg-surface-dim border border-white/5 text-foreground-muted font-mono text-xs';
+        });
+        btn.className = 'vad-btn tactile-btn py-2.5 rounded-xl bg-surface-card-high border border-toxic/40 text-toxic font-mono text-xs font-bold';
+        showToast('VAD SENSITIVITY: ' + mode);
+      }
+      function setGazeMode(btn) {
+        document.querySelectorAll('.gaze-btn').forEach(b => {
+          b.className = 'gaze-btn tactile-btn py-2.5 rounded-xl bg-surface-dim border border-white/5 text-foreground-muted font-mono text-xs';
+        });
+        btn.className = 'gaze-btn tactile-btn py-2.5 rounded-xl bg-surface-card-high border border-toxic/40 text-toxic font-mono text-xs font-bold';
+      }
+      // Store Customizer & Actions
+      function selectFinish(name, key, btn) {
+        document.getElementById('selected-finish-name').innerText = name;
+        const chassis = document.getElementById('product-chassis');
+        const colors = {
+          toxic: '#00ff66',
+          obsidian: '#121317',
+          cloud: '#D7D4CD',
+          lilac: '#8C72A8'
+        };
+        if (chassis && colors[key]) {
+          chassis.style.backgroundColor = colors[key];
+          if (key === 'toxic') {
+            chassis.style.boxShadow = '0 25px 50px rgba(0,0,0,0.95), 0 0 30px rgba(0,255,102,0.5)';
+          } else {
+            chassis.style.boxShadow = '0 25px 50px rgba(0,0,0,0.95)';
+          }
+        }
+        document.querySelectorAll('.finish-pill').forEach(p => {
+          p.classList.remove('border-2', 'border-toxic', 'shadow-toxic-sm');
+          p.classList.add('border', 'border-white/5');
+        });
+        btn.classList.remove('border-white/5');
+        btn.classList.add('border-2', 'border-toxic', 'shadow-toxic-sm');
+      }
+      function adjustHeroQty(delta) {
+        heroQuantity = Math.max(1, Math.min(10, heroQuantity + delta));
+        document.getElementById('hero-qty').innerText = heroQuantity;
+      }
+      function addToCartKit(name, price) {
+        cartCount += heroQuantity;
+        const countStr = cartCount < 10 ? '0' + cartCount : '' + cartCount;
+        document.getElementById('header-cart-count').innerText = countStr;
+        showToast(name + ' (' + heroQuantity + 'X) ALLOCATED');
+      }
+      function checkPincode(btn) {
+        btn.innerText = 'CHECKING';
+        setTimeout(() => {
+          btn.innerText = 'VALID (48H)';
+          showToast('PINCODE VALIDATED // READY FOR DISPATCH');
+        }, 600);
+      }
+      function showToast(message) {
+        const toast = document.getElementById('cart-toast');
+        const title = document.getElementById('toast-title');
+        if (!toast || !title) return;
+        title.innerText = message;
+        toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+        toast.classList.add('opacity-100', 'translate-y-0');
+        setTimeout(() => {
+          toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+          toast.classList.remove('opacity-100', 'translate-y-0');
+        }, 2400);
+      }
+      // Auto-advance PIN inputs
+      const pinInputs = document.querySelectorAll('.pin-box');
+      pinInputs.forEach((input, index) => {
+        input.addEventListener('keyup', (e) => {
+          if (e.key >= '0' && e.key <= '9') {
+            if (index < pinInputs.length - 1) pinInputs[index + 1].focus();
+          } else if (e.key === 'Backspace') {
+            if (index > 0 && !input.value) pinInputs[index - 1].focus();
+          }
+        });
+      });
+      function simulateQRScan(btn) {
+        btn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin text-toxic">sync</span> SCANNING MATRIX...';
+        setTimeout(() => {
+          btn.innerHTML = '<span class="material-symbols-outlined text-[18px] text-toxic">check_circle</span> BOUND: PC01-ESP32-REV2.4';
+          showToast('OPTICAL KEY REGISTERED');
+        }, 900);
+      }
+      // ESP32-S3 WebSocket Engine
+      function connectToESP32() {
+        const ip = document.getElementById('esp-ip-input').value.trim();
+        const btn = document.getElementById('connect-esp-btn');
+        const badge = document.getElementById('socket-badge');
+        btn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">sync</span> CONNECTING TO NODE...';
+        if (espSocket) {
+          espSocket.close();
+        }
+        try {
+          espSocket = new WebSocket(`ws://${ip}/ws`);
+          espSocket.onopen = () => {
+            btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">verified</span> LINK ESTABLISHED';
+            badge.innerText = 'WI-FI LINKED';
+            badge.className = 'px-2.5 py-1 rounded-md text-[10px] font-mono font-bold bg-toxic text-black shadow-toxic-sm';
+            document.getElementById('header-connection-status').innerText = 'WI-FI SYNC';
+            document.getElementById('console-line').innerText = `WS_CONNECTED: Streaming telemetry from ${ip}`;
+            showToast(`ESP32-S3 LINKED (${ip})`);
+          };
+          espSocket.onmessage = (event) => {
+            try {
+              const data = JSON.parse(event.data);
+              if (data.type === 'telemetry') {
+                if (data.battery) {
+                  document.getElementById('telemetry-volt-label').innerText = `${data.battery}% · ${data.voltage || '4.12'}V`;
+                }
+                if (data.rssi) {
+                  document.getElementById('wifi-dbm').innerText = `${data.rssi} dBm`;
+                  document.getElementById('wifi-card-rssi').innerText = `${data.rssi} dBm`;
+                }
+                if (data.wattage) {
+                  document.getElementById('amp-wattage').innerText = `${data.wattage}W`;
+                }
+                if (typeof data.power !== 'undefined' && data.power !== isPoweredOn) {
+                  isPoweredOn = data.power;
+                  toggleSystemPower();
+                }
+              }
+            } catch (err) {
+              console.error('Telemetry parse error:', err);
+            }
+          };
+          espSocket.onerror = (err) => {
+            btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">warning</span> CONNECTION FAILED';
+            badge.innerText = 'OFFLINE';
+            badge.className = 'px-2.5 py-1 rounded-md text-[10px] font-mono font-bold bg-red-900/40 text-red-400 border border-red-500/30';
+            showToast('ESP32 NOT DETECTED // CHECK IP & WI-FI');
+          };
+          espSocket.onclose = () => {
+            badge.innerText = 'STANDBY';
+          };
+        } catch (e) {
+          btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">error</span> ERROR';
+        }
+      }
+      function sendEspCommand(payload) {
+        if (espSocket && espSocket.readyState === WebSocket.OPEN) {
+          espSocket.send(JSON.stringify(payload));
+        }
+      }
+      // Canvas Oscilloscope
+      const canvas = document.getElementById('telemetry-canvas');
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        let offset = 0;
+        function resizeCanvas() {
+          canvas.width = canvas.parentElement.clientWidth * window.devicePixelRatio;
+          canvas.height = canvas.parentElement.clientHeight * window.devicePixelRatio;
+          ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        function drawOscilloscope() {
+          const w = canvas.parentElement.clientWidth;
+          const h = canvas.parentElement.clientHeight;
+          ctx.clearRect(0, 0, w, h);
+          ctx.strokeStyle = 'rgba(0, 255, 102, 0.08)';
+          ctx.lineWidth = 1;
+          for (let x = 0; x < w; x += 30) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, h);
+            ctx.stroke();
+          }
+          for (let y = 0; y < h; y += 24) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(w, y);
+            ctx.stroke();
+          }
+          ctx.beginPath();
+          for (let x = 0; x < w; x++) {
+            const y = h * 0.5 + Math.sin((x + offset) * 0.035) * 16 + Math.sin((x * 0.02) + offset * 0.025) * 8;
+            if (x === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.strokeStyle = '#00ff66';
+          ctx.lineWidth = 2.5;
+          ctx.shadowColor = '#00ff66';
+          ctx.shadowBlur = 14;
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+          offset += 2.2;
+          requestAnimationFrame(drawOscilloscope);
+        }
+        requestAnimationFrame(drawOscilloscope);
+      }
+      // Start organic blinking cycle
+      scheduleNextBlink();
+    </script>
+  </body>
+
+  </html>
