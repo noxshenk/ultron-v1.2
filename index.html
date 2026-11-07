@@ -283,7 +283,7 @@ body.is-mobile #partCard{left:14px;right:14px;top:auto;bottom:calc(14px + env(sa
 <footer class="foot" id="footer"><div class="foot__experience" id="footExp"><div class="foot__energy"></div>
 <div class="foot__eyebrow"><b><i></i>NEXUS LABS — FIELD 02</b><span>STATUS — BATCH 02 OPEN</span></div>
 <h2 class="foot__type" id="footType"><span data-text="SMALL">SMALL</span><span data-text="FRIEND.">FRIEND.</span><span data-text="FOREVER.">FOREVER.</span></h2>
-<div class="foot__action"><button class="foot__enter" id="enterLab"><span>ENTER THE LAB</span><svg viewBox="0 0 26 16"><path d="M0 8h24M18 2l6 6-6 6"/></svg></button><p><span>NO SPAM — ONE TRANSMISSION A MONTH</span><b>@NEXUSLABS — EVERYWHERE</b></p>
+<div class="foot__action"><a href="ultronlab.html" class="foot__enter" id="enterLab"><span>ENTER THE LAB</span><svg viewBox="0 0 26 16"><path d="M0 8h24M18 2l6 6-6 6"/></svg></a><p><span>NO SPAM — ONE TRANSMISSION A MONTH</span><b>@NEXUSLABS — EVERYWHERE</b></p>
 </div></div>
 <div class="foot__body"><div class="foot__brand"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 4"/><path d="M12 4L20.5 19H3.5L12 4Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="bevel"/></svg><span>NEXUS</span></div>
 <nav class="foot__nav"><ul><li><a href="#hero">POCKET COMPANION</a></li><li><a href="#teardown">TEARDOWN</a></li><li><a href="#specs">SPECS</a></li><li><a href="#buy">RESERVE</a></li></ul>
@@ -479,7 +479,7 @@ _.setAttribute("aria-pressed",String(e)),Bt.textContent=e?"Hide internals":"Reve
 ae=e,ye.setAttribute("aria-pressed",String(e)),It.textContent=e?"Close explode view":"Explode view",e&&(we=window.scrollY)}
 _.addEventListener("click",()=>Ue(_.getAttribute("aria-pressed")!=="true")),ye.addEventListener("click",()=>Ke(!ae)),addEventListener("scroll",()=>{
 Math.abs(window.scrollY-we)>2&&(_.getAttribute("aria-pressed")==="true"&&Ue(!1),ae&&Ke(!1),fe=0,se=0)},{passive:!0}
-),d("#enterLab").addEventListener("click",()=>window.scrollTo({top:0,behavior:"smooth"})),d("#newsForm").addEventListener("submit",e=>{
+),d("#enterLab").addEventListener("click",()=>{window.location.href="ultronlab.html"}),d("#newsForm").addEventListener("submit",e=>{
 if(e.preventDefault(),!d("#newsMail").value.trim().includes("@")){U("ENTER A VALID ADDRESS");return}
 d("#newsForm").innerHTML='<span class="news-ok">TRANSMISSION RECEIVED \u2014 WELCOME TO THE LAB.</span>',U("SUBSCRIBED \u2014 FIELD TRANSMISSIONS ON")}
 ),D("#moodList li").forEach(e=>e.addEventListener("click",()=>{L=Be[e.dataset.m],D("#moodList li").forEach(o=>o.classList.toggle("on",o===e)),U(`MOOD SET \u2014 ${
